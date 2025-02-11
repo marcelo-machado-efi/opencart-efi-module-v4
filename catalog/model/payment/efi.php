@@ -21,7 +21,7 @@ class Efi extends \Opencart\System\Engine\Model
 
 		if ($status) {
 			$option_data['efi_pix'] = [
-				'code' => 'efi.pix',
+				'code' => 'efi.efi_pix',
 				'name' => $this->language->get('text_title_pix')
 			];
 

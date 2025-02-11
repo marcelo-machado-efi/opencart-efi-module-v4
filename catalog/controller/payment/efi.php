@@ -7,6 +7,8 @@ namespace Opencart\Catalog\Controller\Extension\Efi\Payment;
  */
 class Efi extends \Opencart\System\Engine\Controller
 {
+
+
 	/**
 	 * Exibe a interface de pagamento no checkout.
 	 *
@@ -15,11 +17,34 @@ class Efi extends \Opencart\System\Engine\Controller
 	public function index(): string
 	{
 		$this->load->language('extension/efi/payment/efi');
+		$this->load->model('extension/efi/payment/efi_pix_inputs');
+		$this->document->addScript('extension/efi/catalog/view/javascript/libs/imask.min.js');
+		$this->document->addScript('extension/efi/catalog/view/javascript/common/masks.js');
+		$this->document->addStyle('extension/efi/catalog/view/stylesheet/fontawesome/css/all.min.css');
+
+
+
 
 		$data['language'] = $this->config->get('config_language');
 		$data['payment_efi_status'] = $this->config->get('payment_efi_status');
+		$data['inputs'] = $this->model_extension_efi_payment_efi_pix_inputs->getEntryFormatted($this->language);
+		$data['img_logo_url'] =  $this->getImagePath('efi_logo.png');
+
+
 
 		return $this->load->view('extension/efi/payment/efi', $data);
+	}
+
+	/**
+	 * Retorna o caminho completo da imagem do plugin
+	 *
+	 * @param string $imgName Nome do arquivo da imagem
+	 * @return string Caminho completo da imagem
+	 */
+	private function getImagePath(string $imgName): string
+	{
+		$efiImagePath = 'extension/efi/catalog/view/image/';
+		return $efiImagePath  . $imgName;
 	}
 
 	/**
@@ -62,5 +87,20 @@ class Efi extends \Opencart\System\Engine\Controller
 
 		$this->response->addHeader('Content-Type: application/json');
 		$this->response->setOutput(json_encode($json));
+	}
+
+	public function logo(): void
+	{
+		$image_path = DIR_EXTENSION . 'efi/catalog/view/image/efi_logo.png';
+
+		if (is_file($image_path)) {
+			$mime_type = mime_content_type($image_path); // Detecta automaticamente o tipo da imagem
+			header('Content-Type: ' . $mime_type);
+			readfile($image_path);
+			exit;
+		} else {
+			http_response_code(404);
+			echo 'Imagem não encontrada';
+		}
 	}
 }

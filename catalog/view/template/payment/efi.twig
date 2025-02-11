@@ -1,37 +1,71 @@
-<div class="text-end">
-    <button type="button" id="button-confirm" class="btn btn-primary">{{ button_confirm }}</button>
-</div>
+<form class="container p-3 border border-1" id="efi-pix-form">
+    <div class="row justify-content-center">
+        <img src="{{ img_logo_url }}" class="img-fluid col-lg-3 col-md-8" alt="...">
+    </div>
+    <div class="row text-center mb-4">
+        <strong class="fs-4">
+          <i class="fa-brands fa-pix"></i>  Optando por pagar através do pix, a confirmação será feita nos próximos segundos <i class="fa-brands fa-pix"></i>
+        </strong>
+    </div>
+    <div class="row justify-content-between">
+        {% for input in inputs %}
+            <div class="mb-3 col-6">
+                <label for="{{ input.name }}" class="form-label fw-bold">
+                    {{ input.label }}
+                    {% if input.required %}
+                        <span class="text-danger">*</span>
+                    {% endif %}
+                </label>
+                <input type="{{ input.type }}" name="{{ input.name }}" id="{{ input.name }}" 
+                    class="form-control" 
+                    {% if input.required %}required{% endif %}
+                    {% if input['data-mask'] %}data-mask="{{ input['data-mask'] }}"{% endif %}>
+            </div>
+        {% endfor %}
+    </div>
+    <div class="text-end">
+        <button type="button" id="button-confirm" class="btn btn-primary">{{ button_confirm }}</button>
+    </div>
+</form>
 
 <script type="text/javascript">
-    $('#button-confirm').on('click', function () {
-        var element = this;
+    document.getElementById('button-confirm').addEventListener('click', function () {
+        let element = this;
+        let form = document.getElementById('efi-pix-form');
+        let formData = new FormData(form); // Captura os dados do formulário Pix
 
-        $.ajax({
-            url: 'index.php?route=extension/opencart/payment/free_checkout.confirm&language={{ language }}',
-            dataType: 'json',
-            beforeSend: function () {
-                $(element).button('loading');
-            },
-            complete: function () {
-                $(element).button('reset');
-            },
-            success: function (json) {
-                if (json['error']) {
-                    $('#alert').prepend(`
-                        <div class="alert alert-danger alert-dismissible">
-                            <i class="fa-solid fa-circle-exclamation"></i> ${json['error']}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        </div>
-                    `);
-                }
+        // Função para desabilitar o botão e indicar carregamento
+        element.setAttribute('disabled', true);
+        element.textContent = 'Carregando...';
 
-                if (json['redirect']) {
-                    location = json['redirect'];
-                }
-            },
-            error: function (xhr, ajaxOptions, thrownError) {
-                console.log(`${thrownError}\r\n${xhr.statusText}\r\n${xhr.responseText}`);
+        fetch('index.php?route=extension/efi/payment/efi_pix.confirm&language={{ language }}', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(json => {
+            if (json.error) {
+                let alertDiv = document.createElement('div');
+                alertDiv.classList.add('alert', 'alert-danger', 'alert-dismissible');
+                alertDiv.innerHTML = `
+                    <i class="fa-solid fa-circle-exclamation"></i> ${json.error}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                `;
+                document.getElementById('alert').prepend(alertDiv);
             }
+
+            if (json.redirect) {
+                window.location.href = json.redirect;
+            }
+        })
+        .catch(error => console.error('Erro:', error))
+        .finally(() => {
+            element.removeAttribute('disabled');
+            element.textContent = 'Confirmar';
         });
+    });
+    // Inicia a aplicação das máscaras automaticamente
+    document.addEventListener("DOMContentLoaded", () => {
+        new MaskHandler();
     });
 </script>
