@@ -20,7 +20,9 @@ class Efi extends \Opencart\System\Engine\Controller
 		$this->load->model('extension/efi/payment/efi_pix_inputs');
 		$this->document->addScript('extension/efi/catalog/view/javascript/libs/imask.min.js');
 		$this->document->addScript('extension/efi/catalog/view/javascript/common/masks.js');
+		$this->document->addScript('extension/efi/catalog/view/javascript/validation/commonValidations.js');
 		$this->document->addStyle('extension/efi/catalog/view/stylesheet/fontawesome/css/all.min.css');
+		$this->document->addStyle('extension/efi/catalog/view/stylesheet/common/color-brand.css');
 
 
 
@@ -29,6 +31,7 @@ class Efi extends \Opencart\System\Engine\Controller
 		$data['payment_efi_status'] = $this->config->get('payment_efi_status');
 		$data['inputs'] = $this->model_extension_efi_payment_efi_pix_inputs->getEntryFormatted($this->language);
 		$data['img_logo_url'] =  $this->getImagePath('efi_logo.png');
+		$data['btn_confirm_text_pix'] =  $this->language->get('btn_confirm_text_pix');
 
 
 

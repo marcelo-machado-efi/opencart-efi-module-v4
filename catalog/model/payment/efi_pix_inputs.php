@@ -21,7 +21,7 @@ class EfiPixInputs extends \Opencart\System\Engine\Model
                 'required' => true,
                 'label' => $language->get('text_label_customer_name'),
                 'type' => 'text',
-                'data-mask' => false
+                'data-mask' => 'nome'
             ],
             [
                 'name' => 'payment_efi_pix_customer_document',

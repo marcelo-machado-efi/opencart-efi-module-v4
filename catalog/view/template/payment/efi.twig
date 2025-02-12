@@ -1,30 +1,44 @@
 <form class="container p-3 border border-1" id="efi-pix-form">
     <div class="row justify-content-center">
-        <img src="{{ img_logo_url }}" class="img-fluid col-lg-3 col-md-8" alt="...">
+        <img src="{{ img_logo_url }}" class="img-fluid col-lg-3 col-md-5 col-7" alt="...">
     </div>
+
     <div class="row text-center mb-4">
         <strong class="fs-4">
-          <i class="fa-brands fa-pix"></i>  Optando por pagar através do pix, a confirmação será feita nos próximos segundos <i class="fa-brands fa-pix"></i>
+            <i class="fa-brands fa-pix d-none d-lg-inline"></i>
+            Optando por pagar através do pix, a confirmação será feita nos próximos segundos
+            <i class="fa-brands fa-pix d-none d-lg-inline"></i>
         </strong>
     </div>
+
     <div class="row justify-content-between">
         {% for input in inputs %}
-            <div class="mb-3 col-6">
+            <div class="mb-3 col-12 col-lg-6">
                 <label for="{{ input.name }}" class="form-label fw-bold">
                     {{ input.label }}
                     {% if input.required %}
                         <span class="text-danger">*</span>
                     {% endif %}
                 </label>
-                <input type="{{ input.type }}" name="{{ input.name }}" id="{{ input.name }}" 
-                    class="form-control" 
-                    {% if input.required %}required{% endif %}
-                    {% if input['data-mask'] %}data-mask="{{ input['data-mask'] }}"{% endif %}>
+                <input type="{{ input.type }}" name="{{ input.name }}" id="{{ input.name }}"
+                    class="form-control"
+                    {% if input.required %} required {% endif %}
+                    {% if input['data-mask'] %} data-mask="{{ input['data-mask'] }}" {% endif %}>
             </div>
         {% endfor %}
     </div>
-    <div class="text-end">
-        <button type="button" id="button-confirm" class="btn btn-primary">{{ button_confirm }}</button>
+
+    <div class="row justify-content-end">
+        <div class="col-12 col-lg-2">
+            <div class="row justify-content-end ">
+                <div class="col-12  col-lg-8 ">
+                    <button type="button" id="button-confirm" class="btn text-white w-100">
+                        <span id="spinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                        <span id="txt-">{{ btn_confirm_text_pix }}</span>
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 </form>
 
@@ -34,11 +48,11 @@
         let form = document.getElementById('efi-pix-form');
         let formData = new FormData(form); // Captura os dados do formulário Pix
 
-        // Função para desabilitar o botão e indicar carregamento
+        // Desabilita o botão e exibe o spinner
         element.setAttribute('disabled', true);
         element.textContent = 'Carregando...';
 
-        fetch('index.php?route=extension/efi/payment/efi_pix.confirm&language={{ language }}', {
+        fetch('index.php?route=extension/efi/payment/efi_pix.confirm', {
             method: 'POST',
             body: formData
         })
@@ -61,11 +75,13 @@
         .catch(error => console.error('Erro:', error))
         .finally(() => {
             element.removeAttribute('disabled');
-            element.textContent = 'Confirmar';
+            element.textContent = 'Gerar QrCode';
         });
     });
+
     // Inicia a aplicação das máscaras automaticamente
     document.addEventListener("DOMContentLoaded", () => {
         new MaskHandler();
+        CommonValidations.applyValidation();
     });
 </script>

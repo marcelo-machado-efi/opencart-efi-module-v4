@@ -1,0 +1,7 @@
+:root {
+    --brand-color: #F37021;
+}
+
+#button-confirm {
+    background-color: var(--brand-color);
+}
