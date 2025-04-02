@@ -1,13 +1,23 @@
+{% for style in styles %}
+    <script>
+    
+        if (!document.querySelector('link[href="{{ style.href }}"]')) {
+            let link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = "{{ style.href }}";
+            document.head.appendChild(link);
+        }
+    </script>
+{% endfor %}
+
 <form class="container p-3 border border-1" id="efi-pix-form">
     <div class="row justify-content-center">
         <img src="{{ img_logo_url }}" class="img-fluid col-lg-3 col-md-5 col-7" alt="...">
     </div>
 
     <div class="row text-center mb-4">
-        <strong class="fs-4">
-            <i class="fa-brands fa-pix d-none d-lg-inline"></i>
+        <strong class="fs-5">
             Optando por pagar através do pix, a confirmação será feita nos próximos segundos
-            <i class="fa-brands fa-pix d-none d-lg-inline"></i>
         </strong>
     </div>
 
@@ -29,9 +39,9 @@
     </div>
 
     <div class="row justify-content-end">
-        <div class="col-12 col-lg-2">
-            <div class="row justify-content-end ">
-                <div class="col-12  col-lg-8 ">
+        <div class="col">
+            <div class="row justify-content-end">
+                <div class="col">
                     <button type="button" id="button-confirm" class="btn text-white w-100">
                         <span id="spinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
                         <span id="txt-">{{ btn_confirm_text_pix }}</span>
@@ -42,46 +52,49 @@
     </div>
 </form>
 
-<script type="text/javascript">
-    document.getElementById('button-confirm').addEventListener('click', function () {
-        let element = this;
-        let form = document.getElementById('efi-pix-form');
-        let formData = new FormData(form); // Captura os dados do formulário Pix
+<script>
+    function loadScripts(scriptList, callback) {
+        let index = 0;
 
-        // Desabilita o botão e exibe o spinner
-        element.setAttribute('disabled', true);
-        element.textContent = 'Carregando...';
+        function loadNext() {
+            if (index < scriptList.length) {
+                // Verifica se o script já foi carregado antes de adicionar
+                if (!document.querySelector(`script[src="${scriptList[index].href}"]`)) {
+                    let script = document.createElement("script");
+                    script.src = scriptList[index].href;
+                    script.type = "text/javascript";
+                    script.defer = true;
 
-        fetch('index.php?route=extension/efi/payment/efi_pix.confirm', {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => response.json())
-        .then(json => {
-            if (json.error) {
-                let alertDiv = document.createElement('div');
-                alertDiv.classList.add('alert', 'alert-danger', 'alert-dismissible');
-                alertDiv.innerHTML = `
-                    <i class="fa-solid fa-circle-exclamation"></i> ${json.error}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                `;
-                document.getElementById('alert').prepend(alertDiv);
+                    script.onload = () => {
+                        index++;
+                        loadNext();
+                    };
+
+                    document.body.appendChild(script);
+                } else {
+                    index++;
+                    loadNext();
+                }
+            } else if (typeof callback === "function") {
+                callback();
             }
+        }
 
-            if (json.redirect) {
-                window.location.href = json.redirect;
-            }
-        })
-        .catch(error => console.error('Erro:', error))
-        .finally(() => {
-            element.removeAttribute('disabled');
-            element.textContent = 'Gerar QrCode';
-        });
-    });
+        loadNext();
+    }
 
-    // Inicia a aplicação das máscaras automaticamente
-    document.addEventListener("DOMContentLoaded", () => {
-        new MaskHandler();
-        CommonValidations.applyValidation();
+    // Carregar todos os scripts automaticamente caso não tenham sido carregados
+    let scriptList = [
+        {% for script in scripts %}
+            { href: "{{ script.href }}" },
+        {% endfor %}
+    ];
+
+    loadScripts(scriptList, () => {
+        if (typeof MaskHandler !== 'undefined' && typeof CommonValidations !== 'undefined') {
+            new MaskHandler();
+            new PixFormHandler();
+        }
     });
 </script>
+

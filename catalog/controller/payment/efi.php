@@ -7,8 +7,6 @@ namespace Opencart\Catalog\Controller\Extension\Efi\Payment;
  */
 class Efi extends \Opencart\System\Engine\Controller
 {
-
-
 	/**
 	 * Exibe a interface de pagamento no checkout.
 	 *
@@ -16,26 +14,35 @@ class Efi extends \Opencart\System\Engine\Controller
 	 */
 	public function index(): string
 	{
-		$this->load->language('extension/efi/payment/efi');
-		$this->load->model('extension/efi/payment/efi_pix_inputs');
-		$this->document->addScript('extension/efi/catalog/view/javascript/libs/imask.min.js');
-		$this->document->addScript('extension/efi/catalog/view/javascript/common/masks.js');
-		$this->document->addScript('extension/efi/catalog/view/javascript/validation/commonValidations.js');
-		$this->document->addStyle('extension/efi/catalog/view/stylesheet/fontawesome/css/all.min.css');
-		$this->document->addStyle('extension/efi/catalog/view/stylesheet/common/color-brand.css');
+		try {
+			$this->load->language('extension/efi/payment/efi');
+			$this->load->model('extension/efi/payment/efi_pix_inputs');
+
+			$data['language'] = $this->config->get('config_language');
+			$data['payment_efi_status'] = $this->config->get('payment_efi_status');
+			$data['inputs'] = $this->model_extension_efi_payment_efi_pix_inputs->getEntryFormatted($this->language);
+			$data['img_logo_url'] =  $this->getImagePath('efi_logo.png');
+			$data['btn_confirm_text_pix'] =  $this->language->get('btn_confirm_text_pix');
+
+			// Adicionando CSS e JS
+			$this->document->addStyle('extension/efi/catalog/view/stylesheet/fontawesome/css/all.min.css');
+			$this->document->addStyle('extension/efi/catalog/view/stylesheet/common/color-brand.css');
+			$this->document->addScript('extension/efi/catalog/view/javascript/payments/pixFormHandler.js');
+			$this->document->addScript('extension/efi/catalog/view/javascript/libs/imask.min.js');
+			$this->document->addScript('extension/efi/catalog/view/javascript/common/masks.js');
+			$this->document->addScript('extension/efi/catalog/view/javascript/validation/commonValidations.js');
 
 
+			// Obtendo os scripts e estilos adicionados pelo OpenCart
+			$data['styles'] = $this->document->getStyles();
+			$data['scripts'] = $this->document->getScripts();
 
-
-		$data['language'] = $this->config->get('config_language');
-		$data['payment_efi_status'] = $this->config->get('payment_efi_status');
-		$data['inputs'] = $this->model_extension_efi_payment_efi_pix_inputs->getEntryFormatted($this->language);
-		$data['img_logo_url'] =  $this->getImagePath('efi_logo.png');
-		$data['btn_confirm_text_pix'] =  $this->language->get('btn_confirm_text_pix');
-
-
-
-		return $this->load->view('extension/efi/payment/efi', $data);
+			// Renderiza a view e envia a resposta
+			return $this->load->view('extension/efi/payment/efi', $data);
+		} catch (\Exception $e) {
+			$this->logError($e->getMessage());
+			return '';
+		}
 	}
 
 	/**
@@ -47,7 +54,7 @@ class Efi extends \Opencart\System\Engine\Controller
 	private function getImagePath(string $imgName): string
 	{
 		$efiImagePath = 'extension/efi/catalog/view/image/';
-		return $efiImagePath  . $imgName;
+		return $efiImagePath . $imgName;
 	}
 
 	/**
@@ -61,49 +68,50 @@ class Efi extends \Opencart\System\Engine\Controller
 
 		$json = [];
 
-		if (isset($this->session->data['order_id'])) {
-			$this->load->model('checkout/order');
+		try {
+			if (isset($this->session->data['order_id'])) {
+				$this->load->model('checkout/order');
 
-			$order_info = $this->model_checkout_order->getOrder($this->session->data['order_id']);
+				$order_info = $this->model_checkout_order->getOrder($this->session->data['order_id']);
 
-			if (!$order_info) {
-				$json['redirect'] = $this->url->link('checkout/failure', 'language=' . $this->config->get('config_language'), true);
-				unset($this->session->data['order_id']);
+				if (!$order_info) {
+					$json['redirect'] = $this->url->link('checkout/failure', 'language=' . $this->config->get('config_language'), true);
+					unset($this->session->data['order_id']);
+				}
+			} else {
+				$json['error'] = $this->language->get('error_order');
 			}
-		} else {
-			$json['error'] = $this->language->get('error_order');
-		}
 
-		if (!isset($this->session->data['payment_method']) || $this->session->data['payment_method']['code'] != 'efi.efi') {
-			$json['error'] = $this->language->get('error_payment_method');
-		}
+			if (!isset($this->session->data['payment_method']) || $this->session->data['payment_method']['code'] != 'efi.efi') {
+				$json['error'] = $this->language->get('error_payment_method');
+			}
 
-		if (!$json) {
-			$this->load->model('checkout/order');
+			if (!$json) {
+				$this->load->model('checkout/order');
 
-			// Define o status do pedido conforme a configuração do plugin
-			$order_status_id = $this->config->get('payment_efi_order_status_id');
-			$this->model_checkout_order->addHistory($this->session->data['order_id'], $order_status_id);
+				// Define o status do pedido conforme a configuração do plugin
+				$order_status_id = $this->config->get('payment_efi_order_status_id');
+				$this->model_checkout_order->addHistory($this->session->data['order_id'], $order_status_id);
 
-			$json['redirect'] = $this->url->link('checkout/success', 'language=' . $this->config->get('config_language'), true);
+				$json['redirect'] = $this->url->link('checkout/success', 'language=' . $this->config->get('config_language'), true);
+			}
+		} catch (\Exception $e) {
+			$this->logError($e->getMessage());
+			$json['error'] = 'Erro ao processar o pagamento. Consulte o log.';
 		}
 
 		$this->response->addHeader('Content-Type: application/json');
 		$this->response->setOutput(json_encode($json));
 	}
 
-	public function logo(): void
+	/**
+	 * Registra erros no log `efi.log`
+	 *
+	 * @param string $message Mensagem do erro
+	 */
+	private function logError(string $message): void
 	{
-		$image_path = DIR_EXTENSION . 'efi/catalog/view/image/efi_logo.png';
-
-		if (is_file($image_path)) {
-			$mime_type = mime_content_type($image_path); // Detecta automaticamente o tipo da imagem
-			header('Content-Type: ' . $mime_type);
-			readfile($image_path);
-			exit;
-		} else {
-			http_response_code(404);
-			echo 'Imagem não encontrada';
-		}
+		$log = new \Opencart\System\Library\Log('efi.log');
+		$log->write($message);
 	}
 }

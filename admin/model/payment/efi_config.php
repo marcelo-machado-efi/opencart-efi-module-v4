@@ -3,6 +3,7 @@
 namespace Opencart\Admin\Model\Extension\Efi\Payment;
 
 use \Opencart\System\Library\Language;
+use \Opencart\System\Library\Log;
 
 /**
  * Classe responsável por gerenciar configurações específicas do plugin.
@@ -17,15 +18,29 @@ class EfiConfig extends \Opencart\System\Engine\Model
      */
     public function getConfig(Language $language): array
     {
-        // Carregar e formatar configurações obrigatórias
-        $this->load->model('extension/efi/payment/efi_config_required');
-        $requiredConfig = $this->model_extension_efi_payment_efi_config_required->getEntryFormatted($language);
-        $requiredConfig = $this->populateConfigValues($requiredConfig);
+        $log = new Log('efi.log');
 
-        // Carregar e formatar configurações Pix
-        $this->load->model('extension/efi/payment/efi_config_pix');
-        $pixConfig = $this->model_extension_efi_payment_efi_config_pix->getEntryFormatted($language);
-        $pixConfig = $this->populateConfigValues($pixConfig);
+        $requiredConfig = [];
+        $pixConfig = [];
+
+        try {
+            // Carregar e formatar configurações obrigatórias
+            $this->load->model('extension/efi/payment/efi_config_required');
+            $requiredConfig = $this->model_extension_efi_payment_efi_config_required->getEntryFormatted($language);
+            $requiredConfig = $this->populateConfigValues($requiredConfig);
+            $log->write(json_encode($requiredConfig));
+        } catch (\Exception $e) {
+            $log->write("Erro ao carregar configurações obrigatórias: " . $e->getMessage());
+        }
+
+        try {
+            // Carregar e formatar configurações Pix
+            $this->load->model('extension/efi/payment/efi_config_pix');
+            $pixConfig = $this->model_extension_efi_payment_efi_config_pix->getEntryFormatted($language);
+            $pixConfig = $this->populateConfigValues($pixConfig);
+        } catch (\Exception $e) {
+            $log->write("Erro ao carregar configurações Pix: " . $e->getMessage());
+        }
 
         // Retornar todas as configurações agrupadas
         return [

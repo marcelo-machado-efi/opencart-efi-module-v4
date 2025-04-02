@@ -1,7 +1,6 @@
 class CommonValidations {
     static isValidNome(value) {
-        const parts = value.trim().split(/\s+/); // Divide o nome pelos espaços
-        return parts.length >= 2 && parts[1].length >= 2;
+        return value.trim().length > 0; // Garante que o nome não está vazio
     }
 
     static isValidTelefone(value) {
@@ -102,7 +101,7 @@ class CommonValidations {
         switch (maskType) {
             case 'nome':
                 isValid = CommonValidations.isValidNome(input.value);
-                errorMessage = 'Digite pelo menos um nome e um sobrenome.';
+                errorMessage = 'O nome não pode estar vazio.';
                 break;
             case 'telefone':
                 isValid = CommonValidations.isValidTelefone(input.value);
@@ -145,6 +144,18 @@ class CommonValidations {
         }
     }
 
+    static validate() {
+        let isValid = true;
+
+        document.querySelectorAll('#efi-pix-form [data-mask]').forEach(input => {
+            CommonValidations.validateField(input);
+            if (input.classList.contains('is-invalid')) {
+                isValid = false;
+            }
+        });
+
+        return isValid;
+    }
     static applyValidation() {
         document.querySelectorAll('[data-mask]').forEach(input => {
             input.addEventListener('blur', () => CommonValidations.validateField(input));
@@ -152,5 +163,3 @@ class CommonValidations {
     }
 }
 
-// Aplica validações automaticamente ao carregar a página
-document.addEventListener("DOMContentLoaded", CommonValidations.applyValidation);

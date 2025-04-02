@@ -3,6 +3,7 @@
 namespace Opencart\Admin\Model\Extension\Efi\Payment;
 
 use Opencart\System\Library\Language;
+use Opencart\System\Library\Log;
 
 class EfiConfigRequired extends \Opencart\System\Engine\Model
 {
@@ -14,6 +15,8 @@ class EfiConfigRequired extends \Opencart\System\Engine\Model
      */
     public function getEntryFormatted(Language $language): array
     {
+        $statusOptions = $this->getOrderStatuses();
+
         return [
             'name' => 'Configurações gerais',
             'inputs' => [
@@ -60,6 +63,14 @@ class EfiConfigRequired extends \Opencart\System\Engine\Model
                     'value' => ''
                 ],
                 [
+                    'name' => 'payment_efi_order_status_paid',
+                    'required' => true,
+                    'label' => $language->get('entry_required_status_order_status'),
+                    'type' => 'select',
+                    'value' => '',
+                    'options' => $statusOptions
+                ],
+                [
                     'name' => 'payment_efi_enviroment',
                     'required' => false,
                     'label' => $language->get('entry_required_enviroment'),
@@ -75,5 +86,32 @@ class EfiConfigRequired extends \Opencart\System\Engine\Model
                 ]
             ]
         ];
+    }
+
+    /**
+     * Recupera os status de pedido disponíveis no sistema para preencher o select.
+     *
+     * @return array
+     */
+    private function getOrderStatuses(): array
+    {
+        $options = [];
+
+        try {
+            $this->load->model('localisation/order_status');
+            $results = $this->model_localisation_order_status->getOrderStatuses();
+
+            foreach ($results as $status) {
+                $options[] = [
+                    'value' => $status['order_status_id'],
+                    'label' => $status['name']
+                ];
+            }
+        } catch (\Exception $e) {
+            $log = new Log('efi.log');
+            $log->write('Erro ao carregar os status de pedido: ' . $e->getMessage());
+        }
+
+        return $options;
     }
 }

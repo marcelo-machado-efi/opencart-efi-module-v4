@@ -1,0 +1,108 @@
+{% if success %}
+    <div id="pix-payment-modal" class="modal fade" tabindex="-1" aria-labelledby="pixModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content p-4">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title w-100 text-center">Pagamento via Pix</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="container">
+                        <div class="row justify-content-center mb-3">
+                            <div class="col-6 col-md-4 text-center">
+                                <img src="extension/efi/catalog/view/image/efi_logo.png" class="img-fluid" alt="Logo">
+                            </div>
+                        </div>
+                        <div class="row justify-content-center">
+                            <div class="col-12 col-md-8">
+                                <div class="border p-3 rounded text-center">
+                                    <img src="{{ pix_url }}" class="img-fluid mx-auto d-block" alt="QR Code Pix">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row justify-content-center mt-3">
+                            <div class="col-12 col-md-8 text-center">
+                                <p class="text-muted">Escaneie o QR Code ou copie o código Pix abaixo:</p>
+                            </div>
+                        </div>
+                        <div class="row justify-content-center">
+                            <div class="col-12 col-md-8">
+                                <div class="input-group">
+                                    <input type="text" class="form-control text-center" id="pix-key" value="{{ qrcode }}" readonly>
+                                    <button class="btn btn-primary" id="copyPixKey">Copiar</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row justify-content-center mt-3">
+                            <div class="col-12 col-md-8 text-center">
+                                <p class="text-danger fw-bold" id="pix-timer">Expira em: --:--</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    setTimeout(() => {
+        // Oculta os inputs e labels do formulário após a geração do QR Code
+        document.querySelectorAll('#efi-pix-form input, #efi-pix-form label').forEach(element => {
+            element.style.display = 'none';
+        });
+
+        // Transforma o botão de confirmação para abrir o modal com um clone
+        const confirmButton = document.getElementById('button-confirm');
+        if (confirmButton) {
+            const newButton = confirmButton.cloneNode(true);
+            newButton.innerHTML = 'Visualizar QR Code';
+            newButton.removeAttribute('disabled');
+
+            newButton.addEventListener('click', (e) => {
+                e.preventDefault();
+                let pixModal = new bootstrap.Modal(document.getElementById('pix-payment-modal'), {
+                    keyboard: false,
+                    backdrop: 'static'
+                });
+                pixModal.show();
+            });
+
+            confirmButton.replaceWith(newButton);
+        }
+
+        // Adiciona evento de cópia da chave Pix
+        const copyButton = document.getElementById('copyPixKey');
+        if (copyButton) {
+            copyButton.addEventListener('click', function() {
+                const pixKeyInput = document.getElementById('pix-key');
+                navigator.clipboard.writeText(pixKeyInput.value).then(() => {
+                    this.textContent = 'Copiado!';
+                    setTimeout(() => { this.textContent = 'Copiar'; }, 2000);
+                }).catch(err => console.error("Erro ao copiar Pix:", err));
+            });
+        }
+
+        // Inicia o contador de expiração
+        let expirationTime = {{ expiration_time }};
+        let timerElement = document.getElementById('pix-timer');
+
+        if (timerElement) {
+            let timerId = setInterval(() => {
+                if (expirationTime <= 0) {
+                    clearInterval(timerId);
+                    timerElement.textContent = "Expirado!";
+                } else {
+                    let hours = Math.floor(expirationTime / 3600);
+                    let minutes = Math.floor((expirationTime % 3600) / 60);
+                    let seconds = expirationTime % 60;
+                    
+                    let timeString = hours > 0 ? `${hours}h ${minutes < 10 ? '0' : ''}${minutes}m` : `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+                    timerElement.textContent = `Expira em: ${timeString}`;
+                    expirationTime--;
+                }
+            }, 1000);
+        }
+    }, 500);
+</script>
+
+{% endif %}

@@ -23,6 +23,8 @@ $_['entry_required_account_code']   = 'Identificador da conta';
 $_['entry_required_enviroment']   = 'Ativar ambiente de teste';
 $_['entry_required_status']       = 'Ativar Plugin';
 $_['entry_required_sort_order']   = 'Ordem de Exibição';
+$_['entry_required_status_order_status'] = 'Status do pedido ao finalizar o pagamento';
+
 
 
 

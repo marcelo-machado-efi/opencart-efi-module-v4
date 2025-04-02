@@ -14,6 +14,11 @@ class MaskHandler {
         let maskOptions;
 
         switch (type) {
+            case 'nome':
+                maskOptions = { mask: /^[A-Za-zÀ-ÖØ-öø-ÿ\s]*$/ }; // Permite letras e espaços
+                
+                return; // Não precisa chamar `IMask`, pois é apenas um input normal
+
             case 'telefone':
                 maskOptions = { mask: '(00) 00000-0000' };
                 break;

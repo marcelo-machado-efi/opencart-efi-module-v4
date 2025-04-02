@@ -40,7 +40,7 @@ class EfiPixWebhook extends \Opencart\System\Engine\Model
         if (!empty(HTTPS_CATALOG)) {
             $baseUrl = HTTPS_CATALOG;
         } else {
-            throw new Exception('Detectamos que sua loja não possui configuração TLS ativa. Para garantir segurança e compatibilidade, o TLS é obrigatório para utilizar as APIs da Efí.');
+            throw new Exception('Detectamos que sua loja não possui configuração TLS ativa. Para garantir segurança e compatibilidade, o TLS é obrigatório para utilizar as APIs do Efí.');
         }
 
         return rtrim($baseUrl, '/') . '/index.php?route=extension/efi/payment/efi_pix_webhook';

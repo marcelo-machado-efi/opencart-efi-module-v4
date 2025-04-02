@@ -42,7 +42,6 @@ class EfiValidator extends \Opencart\System\Engine\Model
             }
 
             if (!empty($postData['payment_efi_pix_status']) && isset($configArray['pix'])) {
-                $this->log->write('Chegou no Pix');
                 $error = $this->validateSection($configArray['pix'], $postData);
                 if ($error) {
                     $this->log->write('Erro encontrado: ' . json_encode($error));
