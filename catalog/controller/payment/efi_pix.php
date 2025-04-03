@@ -11,8 +11,8 @@ class EfiPix extends \Opencart\System\Engine\Controller
                 throw new \Exception('Requisição inválida.');
             }
 
-            $customer_name = $this->request->post['payment_efi_pix_customer_name'] ?? '';
-            $customer_document = $this->request->post['payment_efi_pix_customer_document'] ?? '';
+            $customer_name = $this->request->post['payment_efi_customer_name'] ?? '';
+            $customer_document = $this->request->post['payment_efi_customer_document'] ?? '';
             $order_id = $this->session->data['order_id'] ?? 0;
 
             $this->logError("Processando pedido ID: " . $order_id);

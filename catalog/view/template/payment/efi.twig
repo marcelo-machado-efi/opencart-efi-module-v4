@@ -10,14 +10,14 @@
     </script>
 {% endfor %}
 
-<form class="container p-3 border border-1" id="efi-pix-form">
+<form class="container p-3 border border-1" id="{{ efi_payment_id_form }}">
     <div class="row justify-content-center">
         <img src="{{ img_logo_url }}" class="img-fluid col-lg-3 col-md-5 col-7" alt="...">
     </div>
 
     <div class="row text-center mb-4">
         <strong class="fs-5">
-            Optando por pagar através do pix, a confirmação será feita nos próximos segundos
+            {{ efi_payment_description }}
         </strong>
     </div>
 
@@ -44,7 +44,7 @@
                 <div class="col">
                     <button type="button" id="button-confirm" class="btn text-white w-100">
                         <span id="spinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
-                        <span id="txt-">{{ btn_confirm_text_pix }}</span>
+                        <span id="txt-">{{ btn_confirm_text }}</span>
                     </button>
                 </div>
             </div>
@@ -53,7 +53,7 @@
 </form>
 
 <script>
-    function loadScripts(scriptList, callback) {
+    function loadScripts(scriptList) {
         let index = 0;
 
         function loadNext() {
@@ -61,6 +61,7 @@
                 // Verifica se o script já foi carregado antes de adicionar
                 if (!document.querySelector(`script[src="${scriptList[index].href}"]`)) {
                     let script = document.createElement("script");
+                    const form = document.getElementById("{{ efi_payment_id_form }}")
                     script.src = scriptList[index].href;
                     script.type = "text/javascript";
                     script.defer = true;
@@ -70,14 +71,12 @@
                         loadNext();
                     };
 
-                    document.body.appendChild(script);
+                    form.appendChild(script);
                 } else {
                     index++;
                     loadNext();
                 }
-            } else if (typeof callback === "function") {
-                callback();
-            }
+            } 
         }
 
         loadNext();
@@ -90,11 +89,6 @@
         {% endfor %}
     ];
 
-    loadScripts(scriptList, () => {
-        if (typeof MaskHandler !== 'undefined' && typeof CommonValidations !== 'undefined') {
-            new MaskHandler();
-            new PixFormHandler();
-        }
-    });
+    loadScripts(scriptList);
 </script>
 

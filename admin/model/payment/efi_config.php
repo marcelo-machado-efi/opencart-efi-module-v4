@@ -41,11 +41,20 @@ class EfiConfig extends \Opencart\System\Engine\Model
         } catch (\Exception $e) {
             $log->write("Erro ao carregar configurações Pix: " . $e->getMessage());
         }
+        try {
+            // Carregar e formatar configurações Cartão
+            $this->load->model('extension/efi/payment/efi_config_card');
+            $cardConfig = $this->model_extension_efi_payment_efi_config_card->getEntryFormatted($language);
+            $cardConfig = $this->populateConfigValues($cardConfig);
+        } catch (\Exception $e) {
+            $log->write("Erro ao carregar configurações Cartão: " . $e->getMessage());
+        }
 
         // Retornar todas as configurações agrupadas
         return [
             'required' => $requiredConfig,
-            'pix' => $pixConfig
+            'pix' => $pixConfig,
+            'card' => $cardConfig
         ];
     }
 

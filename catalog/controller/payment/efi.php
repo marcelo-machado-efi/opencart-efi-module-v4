@@ -2,42 +2,44 @@
 
 namespace Opencart\Catalog\Controller\Extension\Efi\Payment;
 
-/**
- * Classe responsável pelo processamento do pagamento via EfiPay.
- */
 class Efi extends \Opencart\System\Engine\Controller
 {
-	/**
-	 * Exibe a interface de pagamento no checkout.
-	 *
-	 * @return string
-	 */
 	public function index(): string
 	{
 		try {
 			$this->load->language('extension/efi/payment/efi');
-			$this->load->model('extension/efi/payment/efi_pix_inputs');
+
+			// Recursos comuns
+			$this->document->addStyle('extension/efi/catalog/view/stylesheet/fontawesome/css/all.min.css');
+			$this->document->addStyle('extension/efi/catalog/view/stylesheet/common/color-brand.css');
+			$this->document->addScript('extension/efi/catalog/view/javascript/validation/commonValidations.js');
+			$this->document->addScript('extension/efi/catalog/view/javascript/libs/imask.min.js');
+			$this->document->addScript('extension/efi/catalog/view/javascript/common/masks.js');
 
 			$data['language'] = $this->config->get('config_language');
 			$data['payment_efi_status'] = $this->config->get('payment_efi_status');
-			$data['inputs'] = $this->model_extension_efi_payment_efi_pix_inputs->getEntryFormatted($this->language);
-			$data['img_logo_url'] =  $this->getImagePath('efi_logo.png');
-			$data['btn_confirm_text_pix'] =  $this->language->get('btn_confirm_text_pix');
+			$data['img_logo_url'] = $this->getImagePath('efi_logo.png');
 
-			// Adicionando CSS e JS
-			$this->document->addStyle('extension/efi/catalog/view/stylesheet/fontawesome/css/all.min.css');
-			$this->document->addStyle('extension/efi/catalog/view/stylesheet/common/color-brand.css');
-			$this->document->addScript('extension/efi/catalog/view/javascript/payments/pixFormHandler.js');
-			$this->document->addScript('extension/efi/catalog/view/javascript/libs/imask.min.js');
-			$this->document->addScript('extension/efi/catalog/view/javascript/common/masks.js');
-			$this->document->addScript('extension/efi/catalog/view/javascript/validation/commonValidations.js');
+			$methodCode = $this->session->data['payment_method']['code'] ?? '';
+
+			switch ($methodCode) {
+				case 'efi.efi_pix':
+					$this->loadPixResources($data);
+					break;
+
+				case 'efi.efi_card':
+					$this->loadCardResources($data);
+					break;
+
+				default:
+					$this->logError("Método de pagamento não reconhecido: " . $methodCode);
+					return '';
+			}
 
 
-			// Obtendo os scripts e estilos adicionados pelo OpenCart
 			$data['styles'] = $this->document->getStyles();
 			$data['scripts'] = $this->document->getScripts();
 
-			// Renderiza a view e envia a resposta
 			return $this->load->view('extension/efi/payment/efi', $data);
 		} catch (\Exception $e) {
 			$this->logError($e->getMessage());
@@ -45,73 +47,37 @@ class Efi extends \Opencart\System\Engine\Controller
 		}
 	}
 
-	/**
-	 * Retorna o caminho completo da imagem do plugin
-	 *
-	 * @param string $imgName Nome do arquivo da imagem
-	 * @return string Caminho completo da imagem
-	 */
 	private function getImagePath(string $imgName): string
 	{
-		$efiImagePath = 'extension/efi/catalog/view/image/';
-		return $efiImagePath . $imgName;
+		return 'extension/efi/catalog/view/image/' . $imgName;
 	}
 
-	/**
-	 * Confirma o pagamento e atualiza o status do pedido.
-	 *
-	 * @return void
-	 */
-	public function confirm(): void
-	{
-		$this->load->language('extension/efi/payment/efi');
-
-		$json = [];
-
-		try {
-			if (isset($this->session->data['order_id'])) {
-				$this->load->model('checkout/order');
-
-				$order_info = $this->model_checkout_order->getOrder($this->session->data['order_id']);
-
-				if (!$order_info) {
-					$json['redirect'] = $this->url->link('checkout/failure', 'language=' . $this->config->get('config_language'), true);
-					unset($this->session->data['order_id']);
-				}
-			} else {
-				$json['error'] = $this->language->get('error_order');
-			}
-
-			if (!isset($this->session->data['payment_method']) || $this->session->data['payment_method']['code'] != 'efi.efi') {
-				$json['error'] = $this->language->get('error_payment_method');
-			}
-
-			if (!$json) {
-				$this->load->model('checkout/order');
-
-				// Define o status do pedido conforme a configuração do plugin
-				$order_status_id = $this->config->get('payment_efi_order_status_id');
-				$this->model_checkout_order->addHistory($this->session->data['order_id'], $order_status_id);
-
-				$json['redirect'] = $this->url->link('checkout/success', 'language=' . $this->config->get('config_language'), true);
-			}
-		} catch (\Exception $e) {
-			$this->logError($e->getMessage());
-			$json['error'] = 'Erro ao processar o pagamento. Consulte o log.';
-		}
-
-		$this->response->addHeader('Content-Type: application/json');
-		$this->response->setOutput(json_encode($json));
-	}
-
-	/**
-	 * Registra erros no log `efi.log`
-	 *
-	 * @param string $message Mensagem do erro
-	 */
 	private function logError(string $message): void
 	{
 		$log = new \Opencart\System\Library\Log('efi.log');
 		$log->write($message);
+	}
+
+	private function loadPixResources(array &$data): void
+	{
+		$this->load->model('extension/efi/payment/efi_pix_inputs');
+		$data['inputs'] = $this->model_extension_efi_payment_efi_pix_inputs->getEntryFormatted($this->language);
+		$data['btn_confirm_text'] = $this->language->get('btn_confirm_text_pix');
+		$data['efi_payment_id_form'] = 'efi-pix-form';
+		$data['efi_payment_description'] = $this->language->get('text_description_pix');
+
+		$this->document->addScript('extension/efi/catalog/view/javascript/payments/pix/pixFormHandler.js');
+	}
+
+	private function loadCardResources(array &$data): void
+	{
+		$this->load->model('extension/efi/payment/efi_card_inputs');
+		$data['inputs'] = $this->model_extension_efi_payment_efi_card_inputs->getEntryFormatted($this->language);
+		$data['btn_confirm_text'] = $this->language->get('btn_confirm_text_card');
+		$data['efi_payment_id_form'] = 'efi-card-form';
+		$data['efi_payment_description'] = $this->language->get('text_description_card');
+
+
+		$this->document->addScript('extension/efi/catalog/view/javascript/payments/cardFormHandler.js');
 	}
 }

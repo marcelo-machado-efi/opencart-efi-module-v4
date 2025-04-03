@@ -15,7 +15,7 @@ class EfiConfigPix extends \Opencart\System\Engine\Model
     public function getEntryFormatted(Language $language): array
     {
         return [
-            'name' => 'Configurações Pix',
+            'name' => 'Pix',
             'inputs' => [
                 [
                     'name' => 'payment_efi_pix_key',

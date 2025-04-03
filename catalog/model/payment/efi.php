@@ -8,31 +8,46 @@ class Efi extends \Opencart\System\Engine\Model
 	 * Obtém os métodos de pagamento disponíveis
 	 *
 	 * @param array<string, mixed> $address Dados do endereço do cliente
-	 *
 	 * @return array<string, mixed>
 	 */
 	public function getMethods(array $address = []): array
 	{
 		$this->load->language('extension/efi/payment/efi');
 
-		$status = $this->config->get('payment_efi_pix_status');
 		$option_data = [];
-		$method_data = [];
 
-		if ($status) {
-			$option_data['efi_pix'] = [
-				'code' => 'efi.efi_pix',
-				'name' => $this->language->get('text_title_pix')
-			];
+		// Adiciona métodos de pagamento dinamicamente
+		$this->addPaymentOption($option_data, 'payment_efi_pix_status', 'efi_pix', 'text_title_pix');
+		$this->addPaymentOption($option_data, 'payment_efi_card_status', 'efi_card', 'text_title_card');
 
-			$method_data = [
-				'code'       => 'efi',
-				'name'       => $this->language->get('text_title'),
-				'option'     => $option_data,
-				'sort_order' => $this->config->get('payment_efi_sort_order')
-			];
+		if (empty($option_data)) {
+			return [];
 		}
 
-		return $method_data;
+		return [
+			'code'       => 'efi',
+			'name'       => $this->language->get('text_title'),
+			'option'     => $option_data,
+			'sort_order' => $this->config->get('payment_efi_sort_order')
+		];
+	}
+
+	/**
+	 * Adiciona dinamicamente uma opção de método de pagamento se estiver ativo.
+	 *
+	 * @param array<string, mixed> &$options     Referência ao array de opções
+	 * @param string               $config_key   Chave da configuração de status (ex: payment_efi_pix_status)
+	 * @param string               $code_suffix  Sufixo para o código do método (ex: efi_pix)
+	 * @param string               $language_key Chave do arquivo de linguagem (ex: text_title_pix)
+	 * @return void
+	 */
+	private function addPaymentOption(array &$options, string $config_key, string $code_suffix, string $language_key): void
+	{
+		if ($this->config->get($config_key)) {
+			$options[$code_suffix] = [
+				'code' => 'efi.' . $code_suffix,
+				'name' => $this->language->get($language_key)
+			];
+		}
 	}
 }

@@ -147,7 +147,7 @@ class CommonValidations {
     static validate() {
         let isValid = true;
 
-        document.querySelectorAll('#efi-pix-form [data-mask]').forEach(input => {
+        document.querySelectorAll('[data-mask]').forEach(input => {
             CommonValidations.validateField(input);
             if (input.classList.contains('is-invalid')) {
                 isValid = false;
