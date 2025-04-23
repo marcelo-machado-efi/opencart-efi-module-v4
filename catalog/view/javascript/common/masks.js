@@ -15,12 +15,13 @@ class MaskHandler {
 
         switch (type) {
             case 'nome':
-                maskOptions = { mask: /^[A-Za-zÀ-ÖØ-öø-ÿ\s]*$/ }; // Permite letras e espaços
-                
-                return; // Não precisa chamar `IMask`, pois é apenas um input normal
+                maskOptions = { mask: /^[A-Za-zÀ-ÖØ-öø-ÿ\s]*$/ };
+                return;
 
             case 'telefone':
                 maskOptions = { mask: '(00) 00000-0000' };
+                element.placeholder = '(99) 99999-9999';
+
                 break;
 
             case 'cep':
@@ -33,6 +34,17 @@ class MaskHandler {
 
             case 'cartao':
                 maskOptions = { mask: '0000 0000 0000 0000' };
+                element.placeholder = '0000 0000 0000 0000';
+                break;
+
+            case 'cartao-vencimento':
+                maskOptions = { mask: '00/00' }; // Formato MM/AA
+                element.placeholder = 'MM/AA';
+                break;
+
+            case 'cartao-cvv':
+                maskOptions = { mask: '000[0]' }; // 3 ou 4 dígitos
+                element.placeholder = 'CVV';
                 break;
 
             case 'documento':
@@ -44,6 +56,10 @@ class MaskHandler {
                 };
                 break;
 
+            case 'email':
+                maskOptions = { mask: /^[\s\S]*$/ };
+                break;
+
             default:
                 console.warn(`Máscara não reconhecida: ${type}`);
                 return;
@@ -52,7 +68,3 @@ class MaskHandler {
         IMask(element, maskOptions);
     }
 }
-
-
-
-

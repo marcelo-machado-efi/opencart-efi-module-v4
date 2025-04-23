@@ -1,6 +1,6 @@
 <?php
 
-namespace Opencart\Catalog\Model\Extension\Efi\Payment;
+namespace Opencart\Catalog\Model\Extension\Efi\Payment\Pix;
 
 require_once DIR_OPENCART . 'extension/efi/catalog/vendor/autoload.php';
 

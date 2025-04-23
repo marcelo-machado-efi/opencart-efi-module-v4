@@ -34,11 +34,11 @@ class EfiPix extends \Opencart\System\Engine\Controller
 
             $amount = (float) $order_info['total'];
 
-            $this->load->model('extension/efi/payment/efi_pix');
+            $this->load->model('extension/efi/payment/pix/efi_pix');
             $this->load->model('setting/setting');
             $settings = $this->model_setting_setting->getSetting('payment_efi');
 
-            $pix_data = $this->model_extension_efi_payment_efi_pix->generatePix(
+            $pix_data = $this->model_extension_efi_payment_pix_efi_pix->generatePix(
                 $customer_name,
                 $customer_document,
                 $amount,

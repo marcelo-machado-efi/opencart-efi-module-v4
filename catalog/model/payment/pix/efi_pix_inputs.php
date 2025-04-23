@@ -1,6 +1,6 @@
 <?php
 
-namespace Opencart\Catalog\Model\Extension\Efi\Payment;
+namespace Opencart\Catalog\Model\Extension\Efi\Payment\Pix;
 
 use Opencart\System\Library\Language;
 

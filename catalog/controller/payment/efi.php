@@ -60,24 +60,39 @@ class Efi extends \Opencart\System\Engine\Controller
 
 	private function loadPixResources(array &$data): void
 	{
-		$this->load->model('extension/efi/payment/efi_pix_inputs');
-		$data['inputs'] = $this->model_extension_efi_payment_efi_pix_inputs->getEntryFormatted($this->language);
+		$this->load->model('extension/efi/payment/pix/efi_pix_inputs');
+		$data['inputs'] = $this->model_extension_efi_payment_pix_efi_pix_inputs->getEntryFormatted($this->language);
 		$data['btn_confirm_text'] = $this->language->get('btn_confirm_text_pix');
 		$data['efi_payment_id_form'] = 'efi-pix-form';
 		$data['efi_payment_description'] = $this->language->get('text_description_pix');
+		$data['command_init_form_payment'] = 'new PixFormHandler();';
+
 
 		$this->document->addScript('extension/efi/catalog/view/javascript/payments/pix/pixFormHandler.js');
 	}
 
 	private function loadCardResources(array &$data): void
 	{
-		$this->load->model('extension/efi/payment/efi_card_inputs');
-		$data['inputs'] = $this->model_extension_efi_payment_efi_card_inputs->getEntryFormatted($this->language);
+		$this->load->model('extension/efi/payment/card/efi_card_inputs');
+		$data['inputs'] = $this->model_extension_efi_payment_card_efi_card_inputs->getEntryFormatted($this->language);
 		$data['btn_confirm_text'] = $this->language->get('btn_confirm_text_card');
 		$data['efi_payment_id_form'] = 'efi-card-form';
 		$data['efi_payment_description'] = $this->language->get('text_description_card');
 
 
-		$this->document->addScript('extension/efi/catalog/view/javascript/payments/cardFormHandler.js');
+		$data['account_coude'] = $this->config->get('payment_efi_account_code');
+		$data['envoriment'] = $this->config->get('payment_efi_enviroment') ? 'sandbox' : 'production';
+		$data['total'] = $this->cart->getTotal();
+		$data['command_init_form_payment'] = $this->load->view('extension/efi/payment/efi_script_card', $data);
+
+
+
+
+
+
+		$this->document->addScript('https://cdn.jsdelivr.net/npm/payment-token-efi/dist/payment-token-efi-umd.min.js');
+		$this->document->addScript('extension/efi/catalog/view/javascript/payments/card/CardInstallments.js');
+		$this->document->addScript('extension/efi/catalog/view/javascript/payments/card/CardPaymentToken.js');
+		$this->document->addScript('extension/efi/catalog/view/javascript/payments/card/cardFormHandler.js');
 	}
 }

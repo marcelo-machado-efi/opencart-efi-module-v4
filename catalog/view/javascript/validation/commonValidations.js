@@ -1,6 +1,6 @@
 class CommonValidations {
     static isValidNome(value) {
-        return value.trim().length > 0; // Garante que o nome não está vazio
+        return value.trim().length > 0;
     }
 
     static isValidTelefone(value) {
@@ -74,6 +74,11 @@ class CommonValidations {
         return calcDigit(12) === parseInt(value[12]) && calcDigit(13) === parseInt(value[13]);
     }
 
+    static isValidEmail(value) {
+        const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return regex.test(value);
+    }
+
     static showErrorMessage(input, message) {
         let errorSpan = input.nextElementSibling;
 
@@ -128,6 +133,10 @@ class CommonValidations {
                     errorMessage = 'CNPJ inválido.';
                 }
                 break;
+            case 'email':
+                isValid = CommonValidations.isValidEmail(input.value);
+                errorMessage = 'E-mail inválido.';
+                break;
             default:
                 console.warn(`Nenhuma validação definida para: ${maskType}`);
                 return;
@@ -156,10 +165,10 @@ class CommonValidations {
 
         return isValid;
     }
+
     static applyValidation() {
         document.querySelectorAll('[data-mask]').forEach(input => {
             input.addEventListener('blur', () => CommonValidations.validateField(input));
         });
     }
 }
-

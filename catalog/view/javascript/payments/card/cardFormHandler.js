@@ -1,13 +1,13 @@
-class PixFormHandler {
-    constructor() {
-        this.formId = 'efi-pix-form';
+class CardFormHandler {
+    constructor(config) {
+        this.formId = 'efi-card-form';
         this.buttonId = 'button-confirm';
-        this.endpoint = 'index.php?route=extension/efi/payment/efi_pix.confirm';
-    
+        this.endpoint = 'index.php?route=extension/efi/payment/efi_card.confirm';
+        this.config = config;
         const checkExistence = (resolve, reject) => {
             let attempts = 0;
             const maxAttempts = 50; // 10s / 200ms
-    
+        
             const interval = setInterval(() => {
                 this.form = document.getElementById(this.formId);
                 this.button = document.getElementById(this.buttonId);
@@ -16,7 +16,7 @@ class PixFormHandler {
                     clearInterval(interval);
                     resolve(true);
                 }
-    
+                
                 attempts++;
                 if (attempts >= maxAttempts) {
                     clearInterval(interval);
@@ -27,7 +27,8 @@ class PixFormHandler {
     
         new Promise(checkExistence)
             .then(() => this.init())
-            .catch(() => {
+            .catch((error) => {
+                console.log(error);
                 console.error(`Erro: Formulário (${this.formId}) ou botão (${this.buttonId}) não encontrados após 10 segundos.`);
             });
     }
@@ -35,6 +36,7 @@ class PixFormHandler {
 
     init() {
         new MaskHandler();
+        new CardInstallments(this.config);
         this.button.addEventListener('click', (e) => {
             e.preventDefault();
             this.handleFormSubmission();
@@ -42,9 +44,13 @@ class PixFormHandler {
     }
 
     handleFormSubmission() {
+        const cardPaymentToken = new CardPaymentToken(this.config);
         if (!CommonValidations.validate()) {
             this.displayAlert('danger', 'Por favor, preencha corretamente todos os campos obrigatórios.');
             return;
+        }
+        if (cardPaymentToken.generateToken()) {
+            
         }
 
         this.submitForm();
@@ -65,7 +71,7 @@ class PixFormHandler {
             let htmlResponse = await response.text(); // Captura o HTML
 
             if (!htmlResponse.trim()) {
-                this.displayAlert('danger', 'Erro ao gerar o QR Code. Resposta vazia do servidor.');
+                this.displayAlert('danger', 'Erro ao processar pagamento. Resposta vazia do servidor.');
                 return;
             }
 
@@ -137,7 +143,7 @@ class PixFormHandler {
             this.button.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Carregando...`;
         } else {
             this.button.removeAttribute('disabled');
-            this.button.innerHTML = 'Gerar QrCode';
+            this.button.innerHTML = 'Pagar';
         }
     }
 
@@ -153,5 +159,4 @@ class PixFormHandler {
         alertContainer.prepend(alertDiv);
     }
 }
-
 
