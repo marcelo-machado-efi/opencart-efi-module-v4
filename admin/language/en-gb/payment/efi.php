@@ -33,7 +33,7 @@ $_['entry_pix_key']   = 'Chave Pix';
 $_['entry_pix_expire_at']   = 'Tempo de expiração da cobrança';
 $_['entry_pix_discount']   = 'Desconto';
 $_['entry_pix_certificate']   = 'Certificado';
-$_['entry_pix_mtls']   = 'Ativar mTLS';
+$_['entry_pix_mtls']   = 'Validar mTLS';
 $_['entry_pix_status']   = 'Ativar';
 
 
@@ -41,9 +41,9 @@ $_['entry_pix_status']   = 'Ativar';
 $_['entry_billet_expire_at']   = 'Dias para vencimento do boleto';
 $_['entry_billet_discount']   = 'Desconto';
 $_['entry_billet_email']   = 'Enviar e-mail para o cliente final';
-$_['entry_billet_fine']   = 'Ativar ambiente de teste';
-$_['entry_billet_interest']   = 'Configuração de multa';
-$_['entry_billet_message']   = 'Configuração de juros';
+$_['entry_billet_fine']   = 'Configuração de multa';
+$_['entry_billet_interest']   = 'Configuração de juros';
+$_['entry_billet_message']   = 'Insira uma mensagem para o cliente final';
 $_['entry_billet_status']   = 'Ativar';
 
 // Entry Credit Card

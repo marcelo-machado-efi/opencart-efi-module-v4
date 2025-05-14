@@ -59,6 +59,7 @@ class EfiPix extends \Opencart\System\Engine\Model
 
             return [
                 'success' => true,
+                'locId' => $pix_charge['loc']['id'],
                 'qrcode' => $qrcode['qrcode'],
                 'pix_url' => $qrcode['imagemQrcode'],
                 'txid' => $txid,
@@ -73,6 +74,25 @@ class EfiPix extends \Opencart\System\Engine\Model
         }
     }
 
+
+    public function getLocQRCode(string $locId, array $settings)
+    {
+        $options = EfiConfigHelper::getEfiConfig($settings);
+        $efiPay = new EfiPay($options);
+
+        $qrcode = $efiPay->pixGenerateQRCode(['id' => $locId]);
+
+        return $qrcode;
+    }
+    public function getDetailPix(string $txid, array $settings)
+    {
+        $options = EfiConfigHelper::getEfiConfig($settings);
+        $efiPay = new EfiPay($options);
+
+        $qrcode = $efiPay->pixDetailCharge(['txid' => $txid]);
+
+        return $qrcode;
+    }
 
     private function applyDiscount(float $amount, string $discount): float
     {

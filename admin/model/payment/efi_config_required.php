@@ -89,7 +89,7 @@ class EfiConfigRequired extends \Opencart\System\Engine\Model
     }
 
     /**
-     * Recupera os status de pedido disponíveis no sistema para preencher o select.
+     * Recupera os status de pedido disponíveis no sistema para preencher o campo Status do pedido ao finalizar o pagamento .
      *
      * @return array
      */

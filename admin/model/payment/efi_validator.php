@@ -30,7 +30,7 @@ class EfiValidator extends \Opencart\System\Engine\Model
     public function validateConfig(array $configArray, array $postData): ?array
     {
         try {
-            $this->log->write('Iniciando validação de configuração.');
+
 
             // Valida obrigatoriamente as configurações gerais
             if (isset($configArray['required'])) {
@@ -43,6 +43,13 @@ class EfiValidator extends \Opencart\System\Engine\Model
 
             if (!empty($postData['payment_efi_pix_status']) && isset($configArray['pix'])) {
                 $error = $this->validateSection($configArray['pix'], $postData);
+                if ($error) {
+                    $this->log->write('Erro encontrado: ' . json_encode($error));
+                    return $error;
+                }
+            }
+            if (!empty($postData['payment_efi_billet_status']) && isset($configArray['billet'])) {
+                $error = $this->validateSection($configArray['billet'], $postData);
                 if ($error) {
                     $this->log->write('Erro encontrado: ' . json_encode($error));
                     return $error;

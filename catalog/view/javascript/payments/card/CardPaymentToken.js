@@ -7,6 +7,9 @@ class CardPaymentToken {
 		this.formId = 'efi-card-form';
 
 		this.fields = this.extractFields();
+
+
+
 	}
 
 	extractFields() {
@@ -43,12 +46,10 @@ class CardPaymentToken {
 				})
 				.getPaymentToken();
 
-			this.insertTokenHiddenInput(result.payment_token);
-			
 
-			
+			let responseSuccess = this.insertTokenHiddenInput(result.payment_token);
 
-			return result;
+			return responseSuccess;
 		} catch (error) {
 			console.error("Erro ao gerar token de pagamento:", error);
 			throw error;
@@ -56,17 +57,25 @@ class CardPaymentToken {
 	}
 
 	insertTokenHiddenInput(token) {
-		const form = document.getElementById(this.formId);
-		if (form) {
-			let input = document.createElement('input');
-			input.type = 'hidden';
-			input.name = 'payment_token';
-			input.value = token;
-			form.appendChild(input);
+		const input = document.getElementById('payment_efi_customer_card_payment_token');
 
-			this.clearCardFields();
+		if (!input) {
+			console.error('Input hidden para token não encontrado.');
+			return false;
 		}
+
+		// Aguarda explicitamente até garantir que o valor foi inserido no DOM
+		input.value = token;
+
+		// Força o DOM a processar o valor inserido antes de continuar
+		return new Promise((resolve) => {
+			requestAnimationFrame(() => {
+				this.clearCardFields();
+				resolve(true);
+			});
+		});
 	}
+
 
 	clearCardFields() {
 		const ids = [

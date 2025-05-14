@@ -133,7 +133,6 @@ class Efi extends \Opencart\System\Engine\Controller
 		try {
 			$this->load->language('extension/efi/payment/efi');
 			$log = new Log('efi.log');
-			$log->write('Inicicou save');
 
 			$json = [];
 
@@ -206,7 +205,7 @@ class Efi extends \Opencart\System\Engine\Controller
 
 			$log = new Log('efi.log');
 
-			$log->write(json_encode($configArray));
+
 
 			// Obtém configurações atuais
 			$currentSettings = $this->model_setting_setting->getSetting('payment_efi');
@@ -224,7 +223,8 @@ class Efi extends \Opencart\System\Engine\Controller
 		} catch (\Throwable $th) {
 			$log->write(json_encode(["error" => $th->getMessage()]));
 
-			$this->sendJsonResponse(["error" => $th->getMessage()]);
+
+			return ["error" => $th->getMessage()];
 		}
 	}
 

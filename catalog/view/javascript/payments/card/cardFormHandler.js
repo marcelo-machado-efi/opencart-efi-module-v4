@@ -4,19 +4,27 @@ class CardFormHandler {
         this.buttonId = 'button-confirm';
         this.endpoint = 'index.php?route=extension/efi/payment/efi_card.confirm';
         this.config = config;
+
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'payment_efi_customer_card_payment_token';
+        input.id = 'payment_efi_customer_card_payment_token';
+        const form = document.getElementById(this.formId);
+        form.appendChild(input);
+
         const checkExistence = (resolve, reject) => {
             let attempts = 0;
             const maxAttempts = 50; // 10s / 200ms
-        
+
             const interval = setInterval(() => {
                 this.form = document.getElementById(this.formId);
                 this.button = document.getElementById(this.buttonId);
-    
+
                 if (this.form && this.button) {
                     clearInterval(interval);
                     resolve(true);
                 }
-                
+
                 attempts++;
                 if (attempts >= maxAttempts) {
                     clearInterval(interval);
@@ -24,7 +32,7 @@ class CardFormHandler {
                 }
             }, 200);
         };
-    
+
         new Promise(checkExistence)
             .then(() => this.init())
             .catch((error) => {
@@ -32,35 +40,40 @@ class CardFormHandler {
                 console.error(`Erro: Formulário (${this.formId}) ou botão (${this.buttonId}) não encontrados após 10 segundos.`);
             });
     }
-    
+
 
     init() {
         new MaskHandler();
         new CardInstallments(this.config);
         this.button.addEventListener('click', (e) => {
             e.preventDefault();
+            this.disableButton(true);
             this.handleFormSubmission();
         });
     }
 
-    handleFormSubmission() {
+    async handleFormSubmission() {
         const cardPaymentToken = new CardPaymentToken(this.config);
+
         if (!CommonValidations.validate()) {
             this.displayAlert('danger', 'Por favor, preencha corretamente todos os campos obrigatórios.');
+            this.disableButton(false);
             return;
         }
-        if (cardPaymentToken.generateToken()) {
-            
-        }
 
-        this.submitForm();
+        const tokenReady = await cardPaymentToken.generateToken();
+
+        if (tokenReady) {
+            this.submitForm();
+        }
     }
+
 
     async submitForm() {
         if (!this.form || !this.button) return;
 
         let formData = new FormData(this.form);
-        this.disableButton(true);
+
 
         try {
             let response = await fetch(this.endpoint, {
@@ -68,14 +81,21 @@ class CardFormHandler {
                 body: formData
             });
 
-            let htmlResponse = await response.text(); // Captura o HTML
+            let jsonResponse = await response.json(); // Captura o HTML
 
-            if (!htmlResponse.trim()) {
-                this.displayAlert('danger', 'Erro ao processar pagamento. Resposta vazia do servidor.');
-                return;
+
+
+            if (jsonResponse.success) {
+                this.displayAlert('success', jsonResponse.message);
+                window.location.href = jsonResponse.redirect;
+
+            } else {
+                document.getElementById('payment_efi_customer_card_payment_token').value = '';
+                this.displayAlert('danger', jsonResponse.message);
+
             }
 
-            this.appendResponseToPage(htmlResponse);
+
         } catch (error) {
             console.error('Erro ao enviar formulário:', error);
             this.displayAlert('danger', 'Erro ao processar o pagamento.');
@@ -84,44 +104,8 @@ class CardFormHandler {
         }
     }
 
-    appendResponseToPage(html) {
-        const wrapper = document.createElement('div');
-        wrapper.innerHTML = html;
-    
-        // Remove qualquer modal existente antes de adicionar o novo
-        const existingModal = document.getElementById('pix-payment-modal');
-        if (existingModal) {
-            existingModal.remove();
-        }
-    
-        // Insere a resposta no DOM
-        document.body.appendChild(wrapper);
-    
-        // Encontra e executa scripts embutidos no HTML carregado
-        wrapper.querySelectorAll("script").forEach(oldScript => {
-            const newScript = document.createElement("script");
-            if (oldScript.src) {
-                // Se for um script externo, recarrega corretamente
-                newScript.src = oldScript.src;
-                newScript.defer = true;
-            } else {
-                // Se for um script embutido, recria e executa manualmente
-                newScript.textContent = oldScript.textContent;
-            }
-            document.body.appendChild(newScript);
-        });
-    
-        // Exibe automaticamente o modal após a resposta ser inserida
-        const modalElement = document.getElementById('pix-payment-modal');
-        if (modalElement) {
-            let pixModal = new bootstrap.Modal(modalElement, {
-                keyboard: false,
-                backdrop: 'static'
-            });
-            pixModal.show();
-        }
-    }
-    
+
+
 
     executeInlineScripts(wrapper) {
         // Seleciona todos os scripts embutidos no HTML injetado
@@ -140,7 +124,7 @@ class CardFormHandler {
     disableButton(disable) {
         if (disable) {
             this.button.setAttribute('disabled', true);
-            this.button.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Carregando...`;
+            this.button.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processando...`;
         } else {
             this.button.removeAttribute('disabled');
             this.button.innerHTML = 'Pagar';

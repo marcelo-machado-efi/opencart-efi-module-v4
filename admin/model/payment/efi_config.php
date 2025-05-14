@@ -28,7 +28,6 @@ class EfiConfig extends \Opencart\System\Engine\Model
             $this->load->model('extension/efi/payment/efi_config_required');
             $requiredConfig = $this->model_extension_efi_payment_efi_config_required->getEntryFormatted($language);
             $requiredConfig = $this->populateConfigValues($requiredConfig);
-            $log->write(json_encode($requiredConfig));
         } catch (\Exception $e) {
             $log->write("Erro ao carregar configurações obrigatórias: " . $e->getMessage());
         }
@@ -49,12 +48,21 @@ class EfiConfig extends \Opencart\System\Engine\Model
         } catch (\Exception $e) {
             $log->write("Erro ao carregar configurações Cartão: " . $e->getMessage());
         }
+        try {
+            // Carregar e formatar configurações Cartão
+            $this->load->model('extension/efi/payment/efi_config_billet');
+            $billetConfig = $this->model_extension_efi_payment_efi_config_billet->getEntryFormatted($language);
+            $billetConfig = $this->populateConfigValues($billetConfig);
+        } catch (\Exception $e) {
+            $log->write("Erro ao carregar configurações Boleto: " . $e->getMessage());
+        }
 
         // Retornar todas as configurações agrupadas
         return [
             'required' => $requiredConfig,
             'pix' => $pixConfig,
-            'card' => $cardConfig
+            'card' => $cardConfig,
+            'billet' => $billetConfig,
         ];
     }
 
