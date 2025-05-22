@@ -168,7 +168,7 @@ class CommonValidations {
 
     static applyValidation() {
         document.querySelectorAll('[data-mask]').forEach(input => {
-            input.addEventListener('blur', () => CommonValidations.validateField(input));
+            input.addEventListener('input', () => CommonValidations.validateField(input));
         });
     }
 }

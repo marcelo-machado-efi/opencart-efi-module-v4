@@ -62,7 +62,7 @@ setTimeout(() => {
     const confirmBtn = document.getElementById('button-confirm');
     if (confirmBtn) {
         const openModalBtn = confirmBtn.cloneNode(true);
-        openModalBtn.textContent = 'Visualizar QR Code';
+        openModalBtn.innerHTML = '<i class="fa-brands fa-pix me-1"></i>Visualizar QR Code';
         openModalBtn.removeAttribute('disabled');
         openModalBtn.addEventListener('click', e => {
             e.preventDefault();
@@ -89,10 +89,12 @@ setTimeout(() => {
     let expirationTime = {{ expiration_time }};
     const timerEl = document.getElementById('pix-timer');
     const formatTime = (t) => {
+        const h = Math.floor(t / 3600);
         const m = Math.floor((t % 3600) / 60);
         const s = t % 60;
-        return `${m}:${s < 10 ? '0' : ''}${s}`;
+        return `${h}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
     };
+
 
     if (timerEl) {
         const timerId = setInterval(() => {

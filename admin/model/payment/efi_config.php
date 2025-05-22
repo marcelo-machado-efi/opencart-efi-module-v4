@@ -49,10 +49,18 @@ class EfiConfig extends \Opencart\System\Engine\Model
             $log->write("Erro ao carregar configurações Cartão: " . $e->getMessage());
         }
         try {
-            // Carregar e formatar configurações Cartão
+            // Carregar e formatar configurações Boleto
             $this->load->model('extension/efi/payment/efi_config_billet');
             $billetConfig = $this->model_extension_efi_payment_efi_config_billet->getEntryFormatted($language);
             $billetConfig = $this->populateConfigValues($billetConfig);
+        } catch (\Exception $e) {
+            $log->write("Erro ao carregar configurações Boleto: " . $e->getMessage());
+        }
+        try {
+            // Carregar e formatar configurações Open Finance
+            $this->load->model('extension/efi/payment/efi_config_open_finance');
+            $openFinancetConfig = $this->model_extension_efi_payment_efi_config_open_finance->getEntryFormatted($language);
+            $openFinancetConfig = $this->populateConfigValues($openFinancetConfig);
         } catch (\Exception $e) {
             $log->write("Erro ao carregar configurações Boleto: " . $e->getMessage());
         }
@@ -61,8 +69,9 @@ class EfiConfig extends \Opencart\System\Engine\Model
         return [
             'required' => $requiredConfig,
             'pix' => $pixConfig,
-            'card' => $cardConfig,
             'billet' => $billetConfig,
+            'open_finance' => $openFinancetConfig,
+            'card' => $cardConfig,
         ];
     }
 

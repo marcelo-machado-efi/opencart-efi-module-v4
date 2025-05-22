@@ -15,7 +15,7 @@ class EfiConfigCard extends \Opencart\System\Engine\Model
     public function getEntryFormatted(Language $language): array
     {
         return [
-            'name' => 'Cartão',
+            'name' => 'Cartão de Crédito',
             'inputs' => [
                 [
                     'name' => 'payment_efi_card_status',

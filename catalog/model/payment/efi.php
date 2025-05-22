@@ -19,6 +19,7 @@ class Efi extends \Opencart\System\Engine\Model
 		// Adiciona métodos de pagamento dinamicamente
 		$this->addPaymentOption($option_data, 'payment_efi_pix_status', 'efi_pix', 'text_title_pix');
 		$this->addPaymentOption($option_data, 'payment_efi_card_status', 'efi_card', 'text_title_card');
+		$this->addPaymentOption($option_data, 'payment_efi_billet_status', 'efi_billet', 'text_title_billet');
 
 		if (empty($option_data)) {
 			return [];

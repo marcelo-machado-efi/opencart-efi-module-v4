@@ -30,6 +30,9 @@ class Efi extends \Opencart\System\Engine\Controller
 				case 'efi.efi_card':
 					$this->loadCardResources($data);
 					break;
+				case 'efi.efi_billet':
+					$this->loadBilletResources($data);
+					break;
 
 				default:
 					$this->logError("Método de pagamento não reconhecido: " . $methodCode);
@@ -69,6 +72,18 @@ class Efi extends \Opencart\System\Engine\Controller
 
 
 		$this->document->addScript('extension/efi/catalog/view/javascript/payments/pix/pixFormHandler.js');
+	}
+	private function loadBilletResources(array &$data): void
+	{
+		$this->load->model('extension/efi/payment/billet/efi_billet_inputs');
+		$data['inputs'] = $this->model_extension_efi_payment_billet_efi_billet_inputs->getEntryFormatted($this->language);
+		$data['btn_confirm_text'] = $this->language->get('btn_confirm_text_billet');
+		$data['efi_payment_id_form'] = 'efi-billet-form';
+		$data['efi_payment_description'] = $this->language->get('text_description_billet');
+		$data['command_init_form_payment'] = 'new BilletFormHandler();';
+
+
+		$this->document->addScript('extension/efi/catalog/view/javascript/payments/billet/billetFormHandler.js');
 	}
 
 	private function loadCardResources(array &$data): void
