@@ -52,7 +52,12 @@ class EfiOpenFinanceWebhook extends \Opencart\System\Engine\Model
             $api = new EfiPay($config);
 
             $baseUrl  = $this->getSecureBaseUrl();
-            $language = $this->config->get('config_language');
+            $language = $this->config->get('config_language_admin');
+
+            if (!$language) {
+                throw new Exception('Não foi possível obter o idioma padrão da loja (config_language_admin).');
+            }
+
             $clientId = $data['payment_efi_client_id_production'] ?? null;
 
             if (!$clientId) {
