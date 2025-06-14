@@ -50,7 +50,8 @@ class EfiBillet extends \Opencart\System\Engine\Controller
                 throw new \Exception($charge_data['error']);
             }
             $order_status_id = 2;
-            $this->model_checkout_order->addHistory($order_id, $order_status_id, 'Cobrança via boleto aguardando confirmação:<br><a href="' . $charge_data['link'] . '" class="btn btn-sm btn-primary mt-2" target="_blank">Visualizar Boleto</a>', false);
+            // $this->model_checkout_order->addHistory($order_id, $order_status_id, 'Cobrança via boleto aguardando confirmação:<br><a href="' . $charge_data['link'] . '" class="btn btn-sm btn-primary mt-2" target="_blank">Visualizar Boleto</a>', false);
+            $this->model_checkout_order->addHistory($order_id, $order_status_id, 'Cobrança via boleto aguardando confirmação', false);
             $data = [
                 'link_download_billet' => $charge_data['link']
             ];
