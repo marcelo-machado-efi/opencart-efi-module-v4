@@ -71,8 +71,11 @@ class EfiPixWebhook extends \Opencart\System\Engine\Model
 
         $hmac = $this->generateHmac($webhookBaseUrl, $clientId);
 
-        return $webhookBaseUrl . '&hmac=' . $hmac . '&ignorar=';
+        $language = $this->config->get('config_language');
+
+        return $webhookBaseUrl . '&language=' . $language . '&hmac=' . $hmac . '&ignorar=';
     }
+
 
     /**
      * Registra o webhook Pix com os dados fornecidos.
