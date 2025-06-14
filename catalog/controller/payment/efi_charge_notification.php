@@ -2,7 +2,8 @@
 
 namespace Opencart\Catalog\Controller\Extension\Efi\Payment;
 
-require_once DIR_OPENCART . 'extension/efi/catalog/vendor/autoload.php';
+require_once DIR_EXTENSION . 'efi/library/vendor/autoload.php';
+
 
 use Efi\EfiPay;
 use Efi\Exception\EfiException;

@@ -20,6 +20,7 @@ class Efi extends \Opencart\System\Engine\Model
 		$this->addPaymentOption($option_data, 'payment_efi_pix_status', 'efi_pix', 'text_title_pix');
 		$this->addPaymentOption($option_data, 'payment_efi_card_status', 'efi_card', 'text_title_card');
 		$this->addPaymentOption($option_data, 'payment_efi_billet_status', 'efi_billet', 'text_title_billet');
+		$this->addPaymentOption($option_data, 'payment_efi_open_finance_status', 'efi_open_finance', 'text_title_open_finance');
 
 		if (empty($option_data)) {
 			return [];

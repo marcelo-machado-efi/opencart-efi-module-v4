@@ -1,6 +1,6 @@
 class CardInstallments {
 	constructor(config) {
-        
+
 		this.accountCode = config.accountCode; // Identificador da conta
 		this.environment = config.environment ? 'sandbox' : 'production'; // 'sandbox' ou 'production'
 
@@ -32,7 +32,6 @@ class CardInstallments {
 				.setCardNumber(cardNumber)
 				.verifyCardBrand();
 
-			console.log("Bandeira detectada:", brand);
 
 			this.loadInstallments(brand);
 		} catch (error) {
@@ -42,8 +41,10 @@ class CardInstallments {
 
 	async loadInstallments(brand) {
 		try {
-			console.log(this.total);
-			const total = parseFloat(this.total.replace(/\D/g, '')) * 100;
+			const total = Math.round(parseFloat(this.total) * 100);
+
+
+
 
 			if (!total || isNaN(total)) {
 				console.warn("Valor inválido para cálculo de parcelas.");
@@ -57,7 +58,6 @@ class CardInstallments {
 				.setTotal(total)
 				.getInstallments();
 
-			console.log("Parcelas disponíveis:", installments.installments);
 
 			const select = document.getElementById(this.installmentsSelectId);
 			select.innerHTML = '';

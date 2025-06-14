@@ -45,6 +45,7 @@ class Upload extends \Opencart\System\Engine\Controller
                 $this->load->model('setting/setting');
                 $settings = $this->model_setting_setting->getSetting('payment_efi');
                 $settings['payment_efi_pix_certificate'] = $filePath;
+                $settings['payment_efi_open_finance_certificate'] = $filePath;
                 $this->model_setting_setting->editSetting('payment_efi', $settings);
 
                 $result['success'] = 'Certificado carregado com sucesso! Recarregue a página para ver o novo caminho.';

@@ -1,0 +1,50 @@
+{{ header }}
+
+<div class="container text-center mt-5">
+  {% if erro %}
+    <div class="alert alert-danger" role="alert">
+      {{ erro }}
+    </div>
+  {% else %}
+    <img src="{{ logo }}" alt="Logo da empresa" class="mb-4" style="max-width: 200px;">
+    <p class="lead mb-4">{{ mensagem }}</p>
+
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Aguardando confirmação...</span>
+    </div>
+
+    <p class="mt-3">Aguardando confirmação do pagamento...</p>
+  {% endif %}
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    {% if not erro %}
+    const identificadorPagamento = '{{ identificadorPagamento }}';
+    const verificaStatusUrl = '{{ verificaStatusUrl }}';
+
+    function verificarStatusPagamento() {
+      fetch(`${verificaStatusUrl}&identificadorPagamento=${encodeURIComponent(identificadorPagamento)}`)
+        .then(response => response.json())
+        .then(data => {
+          if (data && data.status === 'confirmado') {
+            window.location.href = 'index.php?route=checkout/success';
+          } else if (data && data.status === 'erro') {
+            const container = document.querySelector('.container');
+            container.innerHTML = `<div class="alert alert-danger" role="alert">${data.mensagem}</div>`;
+          } else {
+            setTimeout(verificarStatusPagamento, 3000);
+          }
+        })
+        .catch(err => {
+          console.error('Erro ao consultar status:', err);
+          setTimeout(verificarStatusPagamento, 5000);
+        });
+    }
+
+    verificarStatusPagamento();
+    {% endif %}
+  });
+</script>
+
+{{ footer }}

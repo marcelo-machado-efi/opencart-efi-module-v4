@@ -1,9 +1,9 @@
-class CardFormHandler {
-    constructor(config) {
-        this.formId = 'efi-card-form';
+class OpenFinanceFormHandler {
+    constructor() {
+        this.formId = 'efi-open-finance-form';
         this.buttonId = 'button-confirm';
-        this.endpoint = 'index.php?route=extension/efi/payment/efi_card.confirm';
-        this.config = config;
+        this.endpoint = 'index.php?route=extension/efi/payment/efi_open_finance.confirm';
+
 
         const input = document.createElement('input');
         input.type = 'hidden';
@@ -44,7 +44,6 @@ class CardFormHandler {
 
     init() {
         new MaskHandler();
-        new CardInstallments(this.config);
         this.button.addEventListener('click', (e) => {
             e.preventDefault();
             this.disableButton(true);
@@ -53,7 +52,6 @@ class CardFormHandler {
     }
 
     async handleFormSubmission() {
-        const cardPaymentToken = new CardPaymentToken(this.config);
 
         if (!CommonValidations.validate()) {
             this.displayAlert('danger', 'Por favor, preencha corretamente todos os campos obrigatórios.');
@@ -61,11 +59,8 @@ class CardFormHandler {
             return;
         }
 
-        const tokenReady = await cardPaymentToken.generateToken();
+        this.submitForm();
 
-        if (tokenReady) {
-            this.submitForm();
-        }
     }
 
 
@@ -87,7 +82,9 @@ class CardFormHandler {
 
             if (jsonResponse.success) {
                 this.displayAlert('success', jsonResponse.message);
-                window.location.href = jsonResponse.redirect;
+                setTimeout(() => {
+                    window.location.href = jsonResponse.redirect;
+                }, 3000);
 
             } else {
                 document.getElementById('payment_efi_customer_card_payment_token').value = '';

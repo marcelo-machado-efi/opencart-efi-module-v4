@@ -33,6 +33,9 @@ class Efi extends \Opencart\System\Engine\Controller
 				case 'efi.efi_billet':
 					$this->loadBilletResources($data);
 					break;
+				case 'efi.efi_open_finance':
+					$this->loadOpenFinanceResources($data);
+					break;
 
 				default:
 					$this->logError("Método de pagamento não reconhecido: " . $methodCode);
@@ -109,5 +112,21 @@ class Efi extends \Opencart\System\Engine\Controller
 		$this->document->addScript('extension/efi/catalog/view/javascript/payments/card/CardInstallments.js');
 		$this->document->addScript('extension/efi/catalog/view/javascript/payments/card/CardPaymentToken.js');
 		$this->document->addScript('extension/efi/catalog/view/javascript/payments/card/cardFormHandler.js');
+	}
+
+	private function loadOpenFinanceResources(array &$data): void
+	{
+		$this->load->model('setting/setting');
+		$settings = $this->model_setting_setting->getSetting('payment_efi');
+		$this->load->model('extension/efi/payment/openfinance/efi_open_finance_inputs');
+		$data['inputs'] = $this->model_extension_efi_payment_openfinance_efi_open_finance_inputs->getEntryFormatted($this->language, $settings);
+
+		$data['btn_confirm_text'] = $this->language->get('btn_confirm_text_open_finance');
+		$data['efi_payment_id_form'] = 'efi-open-finance-form';
+		$data['efi_payment_description'] = $this->language->get('text_description_open_finance');
+		$data['command_init_form_payment'] = 'new OpenFinanceFormHandler();';
+
+
+		$this->document->addScript('extension/efi/catalog/view/javascript/payments/openFinance/openFinanceFormHandler.js');
 	}
 }

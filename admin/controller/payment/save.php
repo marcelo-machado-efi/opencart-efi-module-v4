@@ -6,9 +6,6 @@ use Opencart\System\Library\Log;
 
 class Save extends \Opencart\System\Engine\Controller
 {
-    /**
-     * Salva as configurações e registra os webhooks dos meios ativos
-     */
     public function index(): void
     {
         $log = new Log('efi.log');
@@ -17,7 +14,6 @@ class Save extends \Opencart\System\Engine\Controller
             $this->load->language('extension/efi/payment/efi');
             $json = [];
 
-            // checa permissão no controller principal
             if (!$this->user->hasPermission('modify', 'extension/efi/payment/efi')) {
                 $this->response->addHeader('HTTP/1.1 401 Unauthorized');
                 $this->sendJson(['error' => $this->language->get('error_permission')]);
@@ -26,24 +22,19 @@ class Save extends \Opencart\System\Engine\Controller
 
             $this->load->model('setting/setting');
 
-            // registra webhooks apenas dos métodos ativos
             $webhookErrors = $this->registerWebhooks($this->request->post);
             if (!empty($webhookErrors)) {
-                // retorna todos os erros de webhook num único JSON
                 $this->sendJson([
                     'error' => implode(' | ', $webhookErrors)
                 ]);
                 return;
             }
 
-            // atualiza todas as configurações
             $update = $this->updateSettings();
             if (isset($update['error'])) {
                 $this->sendJson(['error' => $update['error']]);
                 return;
             }
-
-
 
             $this->sendJson(['success' => $this->language->get('text_success')]);
         } catch (\Throwable $e) {
@@ -54,28 +45,26 @@ class Save extends \Opencart\System\Engine\Controller
         }
     }
 
-    /**
-     * Verifica cada meio de pagamento que utiliza webhook, se ativo, aciona seu model de  cadastramento de webhook
-     */
     private function registerWebhooks(array $postData): array
     {
         $errors = [];
 
-        // mapeamento de métodos => [campo_status, model, método_de_registro]
         $methods = [
-            'pix'   => [
-                'status_key'     => 'payment_efi_pix_status',
-                'model_route'    => 'extension/efi/payment/efi_pix_webhook',
-                'register_func'  => 'registerWebhook',
+            'pix' => [
+                'status_key'    => 'payment_efi_pix_status',
+                'model_route'   => 'extension/efi/payment/efi_pix_webhook',
+                'register_func' => 'registerWebhook',
             ],
-            // adicione outros métodos aqui seguindo o padrão
+            'open finance' => [
+                'status_key'    => 'payment_efi_open_finance_status',
+                'model_route'   => 'extension/efi/payment/efi_open_finance_webhook',
+                'register_func' => 'registerWebhook',
+            ],
         ];
 
         foreach ($methods as $name => $cfg) {
             if (!empty($postData[$cfg['status_key']])) {
-                // carrega o model específico
                 $this->load->model($cfg['model_route']);
-                // invoca o método de registro
                 $modelVar = 'model_' . str_replace('/', '_', $cfg['model_route']);
                 $response = $this->$modelVar->{$cfg['register_func']}($postData);
 
@@ -88,9 +77,6 @@ class Save extends \Opencart\System\Engine\Controller
         return $errors;
     }
 
-    /**
-     * Atualiza as configurações do plugin
-     */
     private function updateSettings(): array
     {
         $this->load->model('extension/efi/payment/efi_config');
@@ -105,20 +91,22 @@ class Save extends \Opencart\System\Engine\Controller
 
         $current = $this->model_setting_setting->getSetting('payment_efi');
 
-        // se Pix ativo, mantém o certificado antigo
         if (!empty($this->request->post['payment_efi_pix_status'])) {
             $this->request->post['payment_efi_pix_certificate'] =
                 $current['payment_efi_pix_certificate']
                 ?? $this->request->post['payment_efi_pix_certificate'];
         }
 
+        if (!empty($this->request->post['payment_efi_open_finance_status'])) {
+            $this->request->post['payment_efi_open_finance_certificate'] =
+                $current['payment_efi_open_finance_certificate']
+                ?? $this->request->post['payment_efi_open_finance_certificate'];
+        }
+
         $this->model_setting_setting->editSetting('payment_efi', $this->request->post);
         return ['success' => 'Configurações salvas com sucesso.'];
     }
 
-    /**
-     * Envia resposta JSON
-     */
     private function sendJson(array $json): void
     {
         $this->response->addHeader('Content-Type: application/json');

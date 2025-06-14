@@ -25,6 +25,20 @@ class EfiConfigOpenFinance extends \Opencart\System\Engine\Model
                     'value' => ''
                 ],
                 [
+                    'name' => 'payment_efi_open_finance_discount',
+                    'required' => false,
+                    'label' => $language->get('entry_open_finance_discount'),
+                    'type' => 'text',
+                    'value' => ''
+                ],
+                [
+                    'name' => 'payment_efi_open_finance_certificate',
+                    'required' => true,
+                    'label' => $language->get('entry_open_finance_certificate'),
+                    'type' => 'file',
+                    'value' => ''
+                ],
+                [
                     'name' => 'payment_efi_open_finance_status',
                     'required' => true,
                     'label' => $language->get('entry_open_finance_status'),

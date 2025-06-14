@@ -51,7 +51,8 @@ $_['entry_credit_card_status']   = 'Ativar';
 
 // Entry Open Finance
 $_['entry_open_finance_key']   = 'Chave Pix para recebimento';
-$_['entry_open_finance__discount']   = 'Desconto';
+$_['entry_open_finance_discount']   = 'Desconto';
+$_['entry_open_finance_certificate']   = 'Certificado';
 $_['entry_open_finance_status']   = 'Ativar';
 
 // Entry Status

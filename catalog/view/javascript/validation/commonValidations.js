@@ -1,4 +1,19 @@
 class CommonValidations {
+    static isValidCartaoVencimento(value) {
+        const regex = /^(0[1-9]|1[0-2])\/\d{2}$/;
+        if (!regex.test(value)) return false;
+
+        const [mesStr, anoStr] = value.split('/');
+        const mes = parseInt(mesStr, 10);
+        const ano = parseInt('20' + anoStr, 10); // "25" => 2025
+
+        const agora = new Date();
+        const anoAtual = agora.getFullYear();
+        const mesAtual = agora.getMonth() + 1;
+
+        return ano > anoAtual || (ano === anoAtual && mes > mesAtual);
+    }
+
     static isValidNome(value) {
         return value.trim().length > 0;
     }
@@ -125,11 +140,20 @@ class CommonValidations {
                 errorMessage = 'Número do cartão inválido.';
                 break;
             case 'documento':
-                if (input.value.length <= 14) {
-                    isValid = CommonValidations.isValidCPF(input.value);
+                const isRequired = input.hasAttribute('required');
+                const value = input.value.trim();
+
+                if (!value && !isRequired) {
+                    isValid = true;
+                    errorMessage = '';
+                    break;
+                }
+
+                if (value.length <= 14) {
+                    isValid = CommonValidations.isValidCPF(value);
                     errorMessage = 'CPF inválido.';
                 } else {
-                    isValid = CommonValidations.isValidCNPJ(input.value);
+                    isValid = CommonValidations.isValidCNPJ(value);
                     errorMessage = 'CNPJ inválido.';
                 }
                 break;
@@ -137,6 +161,11 @@ class CommonValidations {
                 isValid = CommonValidations.isValidEmail(input.value);
                 errorMessage = 'E-mail inválido.';
                 break;
+            case 'cartao-vencimento':
+                isValid = CommonValidations.isValidCartaoVencimento(input.value);
+                errorMessage = 'Data inválida ou vencimento já expirado.';
+                break;
+
             default:
                 console.warn(`Nenhuma validação definida para: ${maskType}`);
                 return;
