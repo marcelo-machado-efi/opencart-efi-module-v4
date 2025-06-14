@@ -95,15 +95,34 @@ class EfiPix extends \Opencart\System\Engine\Controller
     {
         try {
             $txid = $this->request->get['txid'] ?? '';
+
             if (empty($txid)) {
                 throw new \Exception('Dados do txid não encontrados.');
             }
 
-            [$pixModel, $settings] = $this->loadPixDependencies();
-            $detailPix = $pixModel->getDetailPix($txid, $settings);
+            $order_id = ltrim(substr($txid, 2), '0');
 
-            $data['status'] = $detailPix['status'];
+            if (!ctype_digit($order_id)) {
+                $this->log->write("Erro: TXID inválido ou não contém um número de pedido válido. TXID recebido: $txid");
+                $this->response->setOutput(json_encode(['error' => 'Pedido inválido.']));
+                return;
+            }
+
+            $this->load->model('checkout/order');
+            $order_info = $this->model_checkout_order->getOrder((int) $order_id);
+
+            if (!$order_info) {
+                $this->log->write("Erro: Pedido não encontrado para o número: $order_id");
+                $this->response->setOutput(json_encode(['error' => 'Pedido não encontrado.']));
+                return;
+            }
+
+            $order_status_id_atual = $order_info['order_status_id'];
+            $order_status_id_pago  = $this->config->get('payment_efi_order_status_paid');
+
+            $data['status'] = ($order_status_id_atual == $order_status_id_pago) ? 'CONCLUIDA' : null;
             $data['redirect'] = $this->url->link('checkout/success', 'language=' . $this->config->get('config_language'));
+
             $this->response->addHeader('Content-Type: application/json');
             $this->response->setOutput(json_encode($data));
         } catch (\Exception $e) {
