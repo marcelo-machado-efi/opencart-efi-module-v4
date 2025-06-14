@@ -2,7 +2,9 @@ class BilletFormHandler {
     constructor() {
         this.formId = 'efi-billet-form';
         this.buttonId = 'button-confirm';
-        this.endpoint = 'index.php?route=extension/efi/payment/efi_billet.confirm';
+
+        const languageParam = typeof efiLanguage !== 'undefined' ? `&language=${efiLanguage}` : '';
+        this.endpoint = `index.php?route=extension/efi/payment/efi_billet.confirm${languageParam}`;
 
         const checkExistence = (resolve, reject) => {
             let attempts = 0;
@@ -31,6 +33,7 @@ class BilletFormHandler {
                 console.error(`Erro: Formulário (${this.formId}) ou botão (${this.buttonId}) não encontrados após 10 segundos.`);
             });
     }
+
 
 
     init() {
@@ -62,7 +65,7 @@ class BilletFormHandler {
                 body: formData
             });
 
-            let htmlResponse = await response.text(); 
+            let htmlResponse = await response.text();
 
             if (!htmlResponse.trim()) {
                 this.displayAlert('danger', 'Erro ao gerar Boleto. Resposta vazia do servidor.');

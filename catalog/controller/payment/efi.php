@@ -42,7 +42,6 @@ class Efi extends \Opencart\System\Engine\Controller
 					return '';
 			}
 
-
 			$data['styles'] = $this->document->getStyles();
 			$data['scripts'] = $this->document->getScripts();
 
@@ -73,9 +72,9 @@ class Efi extends \Opencart\System\Engine\Controller
 		$data['efi_payment_description'] = $this->language->get('text_description_pix');
 		$data['command_init_form_payment'] = 'new PixFormHandler();';
 
-
 		$this->document->addScript('extension/efi/catalog/view/javascript/payments/pix/pixFormHandler.js');
 	}
+
 	private function loadBilletResources(array &$data): void
 	{
 		$this->load->model('extension/efi/payment/billet/efi_billet_inputs');
@@ -84,7 +83,6 @@ class Efi extends \Opencart\System\Engine\Controller
 		$data['efi_payment_id_form'] = 'efi-billet-form';
 		$data['efi_payment_description'] = $this->language->get('text_description_billet');
 		$data['command_init_form_payment'] = 'new BilletFormHandler();';
-
 
 		$this->document->addScript('extension/efi/catalog/view/javascript/payments/billet/billetFormHandler.js');
 	}
@@ -97,16 +95,10 @@ class Efi extends \Opencart\System\Engine\Controller
 		$data['efi_payment_id_form'] = 'efi-card-form';
 		$data['efi_payment_description'] = $this->language->get('text_description_card');
 
-
 		$data['account_coude'] = $this->config->get('payment_efi_account_code');
 		$data['envoriment'] = $this->config->get('payment_efi_enviroment') ? 'sandbox' : 'production';
 		$data['total'] = $this->cart->getTotal();
 		$data['command_init_form_payment'] = $this->load->view('extension/efi/payment/efi_script_card', $data);
-
-
-
-
-
 
 		$this->document->addScript('https://cdn.jsdelivr.net/npm/payment-token-efi/dist/payment-token-efi-umd.min.js');
 		$this->document->addScript('extension/efi/catalog/view/javascript/payments/card/CardInstallments.js');
@@ -118,6 +110,7 @@ class Efi extends \Opencart\System\Engine\Controller
 	{
 		$this->load->model('setting/setting');
 		$settings = $this->model_setting_setting->getSetting('payment_efi');
+
 		$this->load->model('extension/efi/payment/openfinance/efi_open_finance_inputs');
 		$data['inputs'] = $this->model_extension_efi_payment_openfinance_efi_open_finance_inputs->getEntryFormatted($this->language, $settings);
 
@@ -125,7 +118,6 @@ class Efi extends \Opencart\System\Engine\Controller
 		$data['efi_payment_id_form'] = 'efi-open-finance-form';
 		$data['efi_payment_description'] = $this->language->get('text_description_open_finance');
 		$data['command_init_form_payment'] = 'new OpenFinanceFormHandler();';
-
 
 		$this->document->addScript('extension/efi/catalog/view/javascript/payments/openFinance/openFinanceFormHandler.js');
 	}
