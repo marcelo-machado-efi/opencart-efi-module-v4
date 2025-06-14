@@ -70,12 +70,13 @@ class EfiOpenFinanceWebhook extends \Opencart\System\Engine\Model
 
             $body = [
                 'redirectURL'      => $redirectUrl,
-                'webhookURL'       => $webhookUrl,
+                'webhookURL'       => 'https://webhook.site/ca4d310d-e708-4e26-94b3-a914f3167928',
                 'webhookSecurity'  => [
                     'type' => 'hmac',
                     'hash' => $hmacHash
                 ],
-                'processPayment'   => 'sync'
+                'processPayment'   => 'sync',
+                "generateTxIdForInic" => true
             ];
 
             $response = $api->ofConfigUpdate([], $body);
