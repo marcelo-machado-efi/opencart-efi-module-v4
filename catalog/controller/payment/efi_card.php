@@ -62,12 +62,23 @@ class EfiCard extends \Opencart\System\Engine\Controller
                 'status' => $charge_data['status']
             ];
             if ($charge_data['status'] == 'approved') {
-                $this->model_checkout_order->addHistory($order_id, $settings['payment_efi_order_status_paid'], 'Pagamento confirmado via cartão de crédito.', true);
+                $this->model_checkout_order->addHistory(
+                    $order_id,
+                    $settings['payment_efi_order_status_paid'],
+                    'Pagamento confirmado via cartão de crédito.',
+                    true
+                );
+
                 $data['success'] = true;
-                $data['redirect'] = $this->url->link('checkout/success', 'language=' . $this->config->get('config_language'));
+                $data['redirect'] = html_entity_decode(
+                    $this->url->link('checkout/success', 'language=' . $this->config->get('config_language'), true),
+                    ENT_QUOTES,
+                    'UTF-8'
+                );
             } else {
                 $data['success'] = false;
             }
+
 
             // $view = $this->load->view('extension/efi/payment/efi_success_ajax', $data);
             $this->response->addHeader('Content-Type: application/json');
