@@ -2,7 +2,7 @@
 
 namespace Opencart\Catalog\Controller\Extension\Efi\Payment;
 
-class EfiRedirectOpenFinance extends \Opencart\System\Engine\Controller
+class EfiOpenFinanceRedirect extends \Opencart\System\Engine\Controller
 {
     public function index(): void
     {
