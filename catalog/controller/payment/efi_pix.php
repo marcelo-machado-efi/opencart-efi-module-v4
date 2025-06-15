@@ -121,7 +121,7 @@ class EfiPix extends \Opencart\System\Engine\Controller
             $order_status_id_pago  = $this->config->get('payment_efi_order_status_paid');
 
             $data['status'] = ($order_status_id_atual == $order_status_id_pago) ? 'CONCLUIDA' : null;
-            $data['redirect'] = $this->url->link('checkout/success', 'language=' . $this->config->get('config_language'));
+            $data['redirect'] = html_entity_decode($this->url->link('checkout/success', 'language=' . $this->config->get('config_language')));
 
             $this->response->addHeader('Content-Type: application/json');
             $this->response->setOutput(json_encode($data));
