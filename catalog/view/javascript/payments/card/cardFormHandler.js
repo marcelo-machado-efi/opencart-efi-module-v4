@@ -2,7 +2,8 @@ class CardFormHandler {
     constructor(config) {
         this.formId = 'efi-card-form';
         this.buttonId = 'button-confirm';
-        this.endpoint = 'index.php?route=extension/efi/payment/efi_card.confirm';
+        const languageParam = typeof efiLanguage !== 'undefined' ? `&language=${efiLanguage}` : '';
+        this.endpoint = `index.php?route=extension/efi/payment/efi_card.confirm${languageParam}`;
         this.config = config;
 
         const input = document.createElement('input');
@@ -14,7 +15,7 @@ class CardFormHandler {
 
         const checkExistence = (resolve, reject) => {
             let attempts = 0;
-            const maxAttempts = 50; // 10s / 200ms
+            const maxAttempts = 50;
 
             const interval = setInterval(() => {
                 this.form = document.getElementById(this.formId);
@@ -40,7 +41,6 @@ class CardFormHandler {
                 console.error(`Erro: Formulário (${this.formId}) ou botão (${this.buttonId}) não encontrados após 10 segundos.`);
             });
     }
-
 
     init() {
         new MaskHandler();
@@ -68,12 +68,10 @@ class CardFormHandler {
         }
     }
 
-
     async submitForm() {
         if (!this.form || !this.button) return;
 
         let formData = new FormData(this.form);
-
 
         try {
             let response = await fetch(this.endpoint, {
@@ -81,20 +79,15 @@ class CardFormHandler {
                 body: formData
             });
 
-            let jsonResponse = await response.json(); // Captura o HTML
-
-
+            let jsonResponse = await response.json();
 
             if (jsonResponse.success) {
                 this.displayAlert('success', jsonResponse.message);
                 window.location.href = jsonResponse.redirect;
-
             } else {
                 document.getElementById('payment_efi_customer_card_payment_token').value = '';
                 this.displayAlert('danger', jsonResponse.message);
-
             }
-
 
         } catch (error) {
             console.error('Erro ao enviar formulário:', error);
@@ -103,11 +96,6 @@ class CardFormHandler {
             this.disableButton(false);
         }
     }
-
-
-
-
-
 
     disableButton(disable) {
         if (disable) {
@@ -131,4 +119,3 @@ class CardFormHandler {
         alertContainer.prepend(alertDiv);
     }
 }
-
