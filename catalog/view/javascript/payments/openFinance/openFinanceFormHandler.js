@@ -2,8 +2,9 @@ class OpenFinanceFormHandler {
     constructor() {
         this.formId = 'efi-open-finance-form';
         this.buttonId = 'button-confirm';
-        this.endpoint = 'index.php?route=extension/efi/payment/efi_open_finance.confirm';
 
+        const languageParam = typeof efiLanguage !== 'undefined' ? `&language=${efiLanguage}` : '';
+        this.endpoint = `index.php?route=extension/efi/payment/efi_open_finance.confirm${languageParam}`;
 
         const input = document.createElement('input');
         input.type = 'hidden';
@@ -41,7 +42,6 @@ class OpenFinanceFormHandler {
             });
     }
 
-
     init() {
         new MaskHandler();
         this.button.addEventListener('click', (e) => {
@@ -52,7 +52,6 @@ class OpenFinanceFormHandler {
     }
 
     async handleFormSubmission() {
-
         if (!CommonValidations.validate()) {
             this.displayAlert('danger', 'Por favor, preencha corretamente todos os campos obrigatórios.');
             this.disableButton(false);
@@ -60,15 +59,12 @@ class OpenFinanceFormHandler {
         }
 
         this.submitForm();
-
     }
-
 
     async submitForm() {
         if (!this.form || !this.button) return;
 
         let formData = new FormData(this.form);
-
 
         try {
             let response = await fetch(this.endpoint, {
@@ -76,22 +72,17 @@ class OpenFinanceFormHandler {
                 body: formData
             });
 
-            let jsonResponse = await response.json(); // Captura o HTML
-
-
+            let jsonResponse = await response.json();
 
             if (jsonResponse.success) {
                 this.displayAlert('success', jsonResponse.message);
                 setTimeout(() => {
                     window.location.href = jsonResponse.redirect;
                 }, 3000);
-
             } else {
                 document.getElementById('payment_efi_customer_card_payment_token').value = '';
                 this.displayAlert('danger', jsonResponse.message);
-
             }
-
 
         } catch (error) {
             console.error('Erro ao enviar formulário:', error);
@@ -100,11 +91,6 @@ class OpenFinanceFormHandler {
             this.disableButton(false);
         }
     }
-
-
-
-
-
 
     disableButton(disable) {
         if (disable) {
@@ -128,4 +114,3 @@ class OpenFinanceFormHandler {
         alertContainer.prepend(alertDiv);
     }
 }
-
