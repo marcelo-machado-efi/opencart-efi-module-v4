@@ -45,5 +45,4 @@ $_['text_description_billet'] = 'Optando por pagar através do boleto, a confirm
 $_['text_description_open_finance'] = 'Optando por pagar através do Open Finance, a confirmação será feita nos próximos segundos';
 
 //redirect
-
-$_['text_description_open_finance_redirect'] = 'Pagamento em processamento. Por favor, aguarde enquanto finalizamos a confirmação do seu pagamento.';
+$_['text_description_open_finance_redirect'] = 'Pagamento em processamento. Por favor, aguarde enquanto finalizamos a confirmação do seu pagamento...';
