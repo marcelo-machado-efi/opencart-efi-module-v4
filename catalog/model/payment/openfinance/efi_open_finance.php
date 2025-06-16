@@ -88,8 +88,10 @@ class EfiOpenFinance extends \Opencart\System\Engine\Model
             $efiPay = new EfiPay($options);
             $response = $efiPay->ofListPixPayment(['identificadorPagamento' => $identificadorPagamento]);
 
+            $pagamento = $response['pagamentos'][0] ?? null;
+
             return [
-                'status' => $response['status'] ?? 'desconhecido'
+                'status' => $pagamento['status'] ?? 'desconhecido'
             ];
         } catch (Exception $e) {
             $this->logError("Erro ao consultar status do pagamento Open Finance: " . $e->getMessage());
