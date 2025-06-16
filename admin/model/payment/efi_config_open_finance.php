@@ -18,32 +18,36 @@ class EfiConfigOpenFinance extends \Opencart\System\Engine\Model
             'name' => 'Open Finance',
             'inputs' => [
                 [
-                    'name' => 'payment_efi_open_finance_key',
+                    'name'     => 'payment_efi_open_finance_key',
                     'required' => true,
-                    'label' => $language->get('entry_open_finance_key'),
-                    'type' => 'text',
-                    'value' => ''
+                    'label'    => $language->get('entry_open_finance_key'),
+                    'tooltip'  => $language->get('tooltip_open_finance_key'),
+                    'type'     => 'text',
+                    'value'    => ''
                 ],
                 [
-                    'name' => 'payment_efi_open_finance_discount',
+                    'name'     => 'payment_efi_open_finance_discount',
                     'required' => false,
-                    'label' => $language->get('entry_open_finance_discount'),
-                    'type' => 'text',
-                    'value' => ''
+                    'label'    => $language->get('entry_open_finance_discount'),
+                    'tooltip'  => $language->get('tooltip_open_finance_discount'),
+                    'type'     => 'text',
+                    'value'    => ''
                 ],
                 [
-                    'name' => 'payment_efi_open_finance_certificate',
+                    'name'     => 'payment_efi_open_finance_certificate',
                     'required' => true,
-                    'label' => $language->get('entry_open_finance_certificate'),
-                    'type' => 'file',
-                    'value' => ''
+                    'label'    => $language->get('entry_open_finance_certificate'),
+                    'tooltip'  => $language->get('tooltip_open_finance_certificate'),
+                    'type'     => 'file',
+                    'value'    => ''
                 ],
                 [
-                    'name' => 'payment_efi_open_finance_status',
+                    'name'     => 'payment_efi_open_finance_status',
                     'required' => true,
-                    'label' => $language->get('entry_open_finance_status'),
-                    'type' => 'checkbox',
-                    'value' => ''
+                    'label'    => $language->get('entry_open_finance_status'),
+                    'tooltip'  => '', // Não exibe tooltip nesse campo
+                    'type'     => 'checkbox',
+                    'value'    => ''
                 ],
             ]
         ];

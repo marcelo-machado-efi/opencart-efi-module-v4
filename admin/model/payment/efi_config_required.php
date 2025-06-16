@@ -21,75 +21,84 @@ class EfiConfigRequired extends \Opencart\System\Engine\Model
             'name' => 'Configurações gerais',
             'inputs' => [
                 [
-                    'name' => 'payment_efi_client_id_production',
+                    'name'     => 'payment_efi_client_id_production',
                     'required' => true,
-                    'label' => $language->get('entry_required_client_id_production'),
-                    'type' => 'text',
-                    'value' => ''
+                    'label'    => $language->get('entry_required_client_id_production'),
+                    'tooltip'  => $language->get('tooltip_required_client_id_production'),
+                    'type'     => 'text',
+                    'value'    => ''
                 ],
                 [
-                    'name' => 'payment_efi_client_secret_production',
+                    'name'     => 'payment_efi_client_secret_production',
                     'required' => true,
-                    'label' => $language->get('entry_required_client_secret_production'),
-                    'type' => 'text',
-                    'value' => ''
+                    'label'    => $language->get('entry_required_client_secret_production'),
+                    'tooltip'  => $language->get('tooltip_required_client_secret_production'),
+                    'type'     => 'text',
+                    'value'    => ''
                 ],
                 [
-                    'name' => 'payment_efi_client_id_sandbox',
+                    'name'     => 'payment_efi_client_id_sandbox',
                     'required' => true,
-                    'label' => $language->get('entry_required_client_id_sandbox'),
-                    'type' => 'text',
-                    'value' => ''
+                    'label'    => $language->get('entry_required_client_id_sandbox'),
+                    'tooltip'  => $language->get('tooltip_required_client_id_sandbox'),
+                    'type'     => 'text',
+                    'value'    => ''
                 ],
                 [
-                    'name' => 'payment_efi_client_secret_sandbox',
+                    'name'     => 'payment_efi_client_secret_sandbox',
                     'required' => true,
-                    'label' => $language->get('entry_required_client_secret_sandbox'),
-                    'type' => 'text',
-                    'value' => ''
+                    'label'    => $language->get('entry_required_client_secret_sandbox'),
+                    'tooltip'  => $language->get('tooltip_required_client_secret_sandbox'),
+                    'type'     => 'text',
+                    'value'    => ''
                 ],
                 [
-                    'name' => 'payment_efi_account_code',
+                    'name'     => 'payment_efi_account_code',
                     'required' => true,
-                    'label' => $language->get('entry_required_account_code'),
-                    'type' => 'text',
-                    'value' => ''
+                    'label'    => $language->get('entry_required_account_code'),
+                    'tooltip'  => $language->get('tooltip_required_account_code'),
+                    'type'     => 'text',
+                    'value'    => ''
                 ],
                 [
-                    'name' => 'payment_efi_sort_order',
+                    'name'     => 'payment_efi_sort_order',
                     'required' => true,
-                    'label' => $language->get('entry_required_sort_order'),
-                    'type' => 'number',
-                    'value' => ''
+                    'label'    => $language->get('entry_required_sort_order'),
+                    'tooltip'  => $language->get('tooltip_required_sort_order'),
+                    'type'     => 'number',
+                    'value'    => ''
                 ],
                 [
-                    'name' => 'payment_efi_order_status_paid',
+                    'name'     => 'payment_efi_order_status_paid',
                     'required' => true,
-                    'label' => $language->get('entry_required_status_order_status'),
-                    'type' => 'select',
-                    'value' => '',
-                    'options' => $statusOptions
+                    'label'    => $language->get('entry_required_status_order_status'),
+                    'tooltip'  => $language->get('tooltip_required_status_order_status'),
+                    'type'     => 'select',
+                    'value'    => '',
+                    'options'  => $statusOptions
                 ],
                 [
-                    'name' => 'payment_efi_enviroment',
+                    'name'     => 'payment_efi_enviroment',
                     'required' => false,
-                    'label' => $language->get('entry_required_enviroment'),
-                    'type' => 'checkbox',
-                    'value' => ''
+                    'label'    => $language->get('entry_required_enviroment'),
+                    'tooltip'  => '', // sem tooltip definido
+                    'type'     => 'checkbox',
+                    'value'    => ''
                 ],
                 [
-                    'name' => 'payment_efi_status',
+                    'name'     => 'payment_efi_status',
                     'required' => false,
-                    'label' => $language->get('entry_required_status'),
-                    'type' => 'checkbox',
-                    'value' => ''
+                    'label'    => $language->get('entry_required_status'),
+                    'tooltip'  => '', // sem tooltip definido
+                    'type'     => 'checkbox',
+                    'value'    => ''
                 ]
             ]
         ];
     }
 
     /**
-     * Recupera os status de pedido disponíveis no sistema para preencher o campo Status do pedido ao finalizar o pagamento .
+     * Recupera os status de pedido disponíveis no sistema para preencher o campo Status do pedido ao finalizar o pagamento.
      *
      * @return array
      */

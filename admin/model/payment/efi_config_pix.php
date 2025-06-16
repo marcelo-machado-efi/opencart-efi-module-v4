@@ -18,46 +18,52 @@ class EfiConfigPix extends \Opencart\System\Engine\Model
             'name' => 'Pix',
             'inputs' => [
                 [
-                    'name' => 'payment_efi_pix_key',
+                    'name'     => 'payment_efi_pix_key',
                     'required' => true,
-                    'label' => $language->get('entry_pix_key'),
-                    'type' => 'text',
-                    'value' => ''
+                    'label'    => $language->get('entry_pix_key'),
+                    'tooltip'  => $language->get('tooltip_pix_key'),
+                    'type'     => 'text',
+                    'value'    => ''
                 ],
                 [
-                    'name' => 'payment_efi_pix_expire_at',
+                    'name'     => 'payment_efi_pix_expire_at',
                     'required' => true,
-                    'label' => $language->get('entry_pix_expire_at'),
-                    'type' => 'number',
-                    'value' => ''
+                    'label'    => $language->get('entry_pix_expire_at'),
+                    'tooltip'  => $language->get('tooltip_pix_expire_at'),
+                    'type'     => 'number',
+                    'value'    => ''
                 ],
                 [
-                    'name' => 'payment_efi_pix_certificate',
+                    'name'     => 'payment_efi_pix_certificate',
                     'required' => true,
-                    'label' => $language->get('entry_pix_certificate'),
-                    'type' => 'file',
-                    'value' => ''
+                    'label'    => $language->get('entry_pix_certificate'),
+                    'tooltip'  => $language->get('tooltip_pix_certificate'),
+                    'type'     => 'file',
+                    'value'    => ''
                 ],
                 [
-                    'name' => 'payment_efi_pix_discount',
+                    'name'     => 'payment_efi_pix_discount',
                     'required' => false,
-                    'label' => $language->get('entry_pix_discount'),
-                    'type' => 'text',
-                    'value' => ''
+                    'label'    => $language->get('entry_pix_discount'),
+                    'tooltip'  => $language->get('tooltip_pix_discount'),
+                    'type'     => 'text',
+                    'value'    => ''
                 ],
                 [
-                    'name' => 'payment_efi_pix_mtls',
+                    'name'     => 'payment_efi_pix_mtls',
                     'required' => false,
-                    'label' => $language->get('entry_pix_mtls'),
-                    'type' => 'checkbox',
-                    'value' => ''
+                    'label'    => $language->get('entry_pix_mtls'),
+                    'tooltip'  => $language->get('tooltip_pix_mtls'),
+                    'type'     => 'checkbox',
+                    'value'    => ''
                 ],
                 [
-                    'name' => 'payment_efi_pix_status',
+                    'name'     => 'payment_efi_pix_status',
                     'required' => false,
-                    'label' => $language->get('entry_pix_status'),
-                    'type' => 'checkbox',
-                    'value' => ''
+                    'label'    => $language->get('entry_pix_status'),
+                    'tooltip'  => '', // sem tooltip neste campo
+                    'type'     => 'checkbox',
+                    'value'    => ''
                 ]
             ]
         ];

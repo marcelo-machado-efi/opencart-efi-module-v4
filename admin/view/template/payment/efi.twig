@@ -50,6 +50,11 @@
 											{% if input.required %}
 												<span class="text-danger">*</span>
 											{% endif %}
+											{% if input.tooltip %}
+												<span data-bs-toggle="tooltip" title="{{ input.tooltip }}" class="ms-1 text-info" style="cursor: help;">
+													<i class="fa-solid fa-circle-question"></i>
+												</span>
+											{% endif %}
 										</label>
 										<div class="col-sm-10">
 											{% if input.type == 'text' %}
