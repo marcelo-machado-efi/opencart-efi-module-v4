@@ -63,22 +63,25 @@ class EfiPixWebhook extends \Opencart\System\Engine\Model
         $baseUrl = $this->getSecureBaseUrl();
 
         $webhookBaseUrl = $baseUrl . '/index.php?route=extension/efi/payment/efi_pix_webhook';
-        $clientId = $data['payment_efi_client_id_production'] ?? null;
 
+        $language = $this->config->get('config_language_admin');
+        if (!$language) {
+            throw new Exception('Não foi possível obter o idioma padrão da loja (config_language_admin).');
+        }
+
+        // Caso o mtls esteja ativado (valor 1), NÃO adiciona HMAC
+        if (!empty($data['payment_efi_pix_mtls']) && (int)$data['payment_efi_pix_mtls'] === 1) {
+            $this->log->write("MTLS ativado, webhook será cadastrado sem HMAC.");
+            return $webhookBaseUrl . '&language=' . $language . '&ignorar=';
+        }
+
+        // Caso contrário, inclui HMAC normalmente
+        $clientId = $data['payment_efi_client_id_production'] ?? null;
         if (!$clientId) {
             throw new Exception('Client ID de produção não foi encontrado nas configurações.');
         }
 
         $hmac = $this->generateHmac($webhookBaseUrl, $clientId);
-
-        $language = $this->config->get('config_language_admin');
-
-        if (!$language) {
-            throw new Exception('Não foi possível obter o idioma padrão da loja (config_language_admin).');
-        }
-
-        $this->log->write("Idioma padrão da loja: " . $language);
-
         return $webhookBaseUrl . '&language=' . $language . '&hmac=' . $hmac . '&ignorar=';
     }
 

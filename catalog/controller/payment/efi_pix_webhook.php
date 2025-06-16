@@ -13,27 +13,29 @@ class EfiPixWebhook extends \Opencart\System\Engine\Controller
 {
     private Log $log;
 
-    /**
-     * Construtor
-     */
     public function __construct($registry)
     {
         parent::__construct($registry);
         $this->log = new Log('efi_pix_webhook.log');
     }
 
-    /**
-     * Método principal de entrada do Webhook Pix.
-     *
-     * @return void
-     */
     public function index(): void
     {
         try {
             $this->response->addHeader('Content-Type: application/json');
 
-            if (!$this->validateHmac()) {
-                return;
+            // Carregar configurações do módulo
+            $this->load->model('setting/setting');
+            $settings = $this->model_setting_setting->getSetting('payment_efi');
+
+            $mtlsAtivo = (int) ($settings['payment_efi_pix_mtls'] ?? 0) === 1;
+
+            if (!$mtlsAtivo) {
+                if (!$this->validateHmac($settings)) {
+                    return;
+                }
+            } else {
+                $this->log->write('MTLS ativado. Validação de HMAC ignorada.');
             }
 
             $input = file_get_contents('php://input');
@@ -77,15 +79,10 @@ class EfiPixWebhook extends \Opencart\System\Engine\Controller
                         continue;
                     }
 
-                    $order_status_id = $this->config->get('payment_efi_order_status_paid');
+                    $order_status_id = $settings['payment_efi_order_status_paid'] ?? 0;
 
                     if ($order_status_id) {
-                        $this->model_checkout_order->addHistory(
-                            $order_info['order_id'],
-                            $order_status_id,
-                            'Pagamento confirmado via Pix',
-                            true
-                        );
+                        $this->model_checkout_order->addHistory($order_info['order_id'], $order_status_id, 'Pagamento confirmado via Pix', true);
                     }
                 } catch (\Exception $e) {
                     $this->log->write("Erro ao processar transação Pix: " . $e->getMessage());
@@ -101,57 +98,53 @@ class EfiPixWebhook extends \Opencart\System\Engine\Controller
         }
     }
 
-    /**
-     * Valida o HMAC da requisição com base na URL e no Client ID de produção.
-     *
-     * @return bool
-     */
-    private function validateHmac(): bool
+    private function validateHmac(array $settings): bool
     {
         $hmacRecebido = $this->request->get['hmac'] ?? '';
+
         if (!$hmacRecebido) {
             $this->response->addHeader($this->request->server['SERVER_PROTOCOL'] . ' 401 Unauthorized');
             $this->response->setOutput('HMAC não fornecido.');
             return false;
         }
 
-        $clientId = $this->config->get('payment_efi_client_id_production');
+        $clientId = $settings['payment_efi_client_id_production'] ?? '';
         if (!$clientId) {
-            $this->log->write("Erro: Client ID de produção não encontrado na configuração.");
+            $this->log->write("Erro: Client ID de produção não encontrado.");
             $this->response->addHeader($this->request->server['SERVER_PROTOCOL'] . ' 500 Internal Server Error');
-            $this->response->setOutput('Erro interno de configuração.');
+            $this->response->setOutput('Erro de configuração.');
             return false;
         }
 
-        $httpsCatalog = defined('HTTPS_CATALOG') ? HTTPS_CATALOG : '';
-        if (!empty($httpsCatalog)) {
-            $baseUrl = rtrim($httpsCatalog, '/');
-        } else {
-            $proto = $_SERVER['HTTP_X_FORWARDED_PROTO'] ?? null;
-            $host  = $_SERVER['HTTP_HOST'] ?? null;
-
-            if ($proto === 'https' && $host) {
-                $baseUrl = 'https://' . rtrim($host, '/');
-            } else {
-                $this->log->write("Erro: Não foi possível determinar uma URL segura para validar o HMAC.");
-                $this->response->addHeader($this->request->server['SERVER_PROTOCOL'] . ' 500 Internal Server Error');
-                $this->response->setOutput('Erro de validação HMAC.');
-                return false;
-            }
-        }
-
-        $webhookPath = '/index.php?route=extension/efi/payment/efi_pix_webhook';
-        $webhookUrl  = $baseUrl . $webhookPath;
-
+        $webhookUrl = $this->getWebhookUrlBase();
         $hmacCalculado = hash_hmac('sha256', $webhookUrl, $clientId);
 
         if (!hash_equals($hmacCalculado, $hmacRecebido)) {
-            $this->log->write("Erro: HMAC inválido. Recebido: $hmacRecebido | Esperado: $hmacCalculado");
+            $this->log->write("HMAC inválido. Recebido: $hmacRecebido | Esperado: $hmacCalculado");
             $this->response->addHeader($this->request->server['SERVER_PROTOCOL'] . ' 403 Forbidden');
             $this->response->setOutput('HMAC inválido.');
             return false;
         }
 
         return true;
+    }
+
+    private function getWebhookUrlBase(): string
+    {
+        $httpsCatalog = defined('HTTPS_CATALOG') ? HTTPS_CATALOG : '';
+
+        if (!empty($httpsCatalog)) {
+            return rtrim($httpsCatalog, '/') . '/index.php?route=extension/efi/payment/efi_pix_webhook';
+        }
+
+        $proto = $_SERVER['HTTP_X_FORWARDED_PROTO'] ?? null;
+        $host  = $_SERVER['HTTP_HOST'] ?? null;
+
+        if ($proto === 'https' && $host) {
+            return 'https://' . rtrim($host, '/') . '/index.php?route=extension/efi/payment/efi_pix_webhook';
+        }
+
+        $this->log->write("Erro: Não foi possível determinar uma URL segura.");
+        return '';
     }
 }
