@@ -6,14 +6,16 @@
       {{ erro }}
     </div>
   {% else %}
-    <img src="{{ logo }}" alt="Logo da empresa" class="mb-4" style="max-width: 200px;">
-    <p class="lead mb-4">{{ mensagem }}</p>
-
-    <div class="spinner-border text-primary" role="status">
+   
+    <div class="row justify-content-center">
+		  <img src="{{ logo }}" class="img-fluid mb-3 col-lg-3 col-md-5 col-7" alt="...">
+	  </div>
+    
+    <div class="spinner-border " role="status" style="text-color: #F37021">
       <span class="visually-hidden">Aguardando confirmação...</span>
     </div>
 
-    <p class="mt-3">Aguardando confirmação do pagamento...</p>
+    <strong class="fs-5">{{mensagem}}</strong>
   {% endif %}
 </div>
 
