@@ -86,7 +86,7 @@ class EfiOpenFinance extends \Opencart\System\Engine\Model
         try {
             $options = EfiConfigHelper::getEfiConfig($settings);
             $efiPay = new EfiPay($options);
-            $response = $efiPay->ofListPixPayment(['identificadorPagamento' => $identificadorPagamento]);
+            $response = $efiPay->ofListPixPayment(['identificador' => $identificadorPagamento]);
 
             $pagamento = $response['pagamentos'][0] ?? null;
 
