@@ -19,6 +19,7 @@ class EfiBillet extends \Opencart\System\Engine\Model
             $metadata      = $this->getMetadata($order_id);
             $configurations = $this->getConfigurations();
             $message        = $this->getMessage();
+            $discount       = $this->getDiscount($amount);
 
             $paymentData = [
                 'customer'   => $customer_data,
@@ -31,6 +32,10 @@ class EfiBillet extends \Opencart\System\Engine\Model
 
             if (!empty($message)) {
                 $paymentData['message'] = $message;
+            }
+
+            if (!empty($discount)) {
+                $paymentData['discount'] = $discount;
             }
 
             $body = [
@@ -150,6 +155,29 @@ class EfiBillet extends \Opencart\System\Engine\Model
         }
 
         return $configurations;
+    }
+
+    private function getDiscount(float $amount): array
+    {
+        $discountValue = $this->config->get('payment_efi_billet_discount');
+
+        if (!$discountValue || $amount < 10) {
+            return [];
+        }
+
+        $discount = [];
+
+        if (str_ends_with($discountValue, '%')) {
+            $numericValue = (float) rtrim($discountValue, '%');
+            $discount['type'] = 'percentage';
+            $discount['value'] = (int) ($numericValue * 100);
+        } else {
+            $numericValue = (float) str_replace(',', '.', $discountValue);
+            $discount['type'] = 'currency';
+            $discount['value'] = (int) ($numericValue * 100);
+        }
+
+        return $discount;
     }
 
     private function logError(string $message): void
