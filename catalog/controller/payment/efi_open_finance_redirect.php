@@ -8,6 +8,7 @@ class EfiOpenFinanceRedirect extends \Opencart\System\Engine\Controller
     {
         try {
             $data = [];
+            $this->load->language('extension/efi/payment/efi');
 
             // Pega os parâmetros da URL
             $data['identificadorPagamento'] = $this->request->get['identificadorPagamento'] ?? '';
