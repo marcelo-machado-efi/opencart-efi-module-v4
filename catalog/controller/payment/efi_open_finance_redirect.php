@@ -14,6 +14,8 @@ class EfiOpenFinanceRedirect extends \Opencart\System\Engine\Controller
             $data['erro'] = $this->request->get['erro'] ?? '';
             $data['logo'] = $this->getImagePath('efi_logo.png');
             $data['mensagem '] = $this->language->get('text_description_open_finance_redirect');
+            $data['config_language'] = $this->config->get('config_language');
+
 
             // Adiciona a URL de verificação do status
             $data['verificaStatusUrl'] = urldecode(

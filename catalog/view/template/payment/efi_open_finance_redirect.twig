@@ -22,14 +22,14 @@
     {% if not erro %}
     const identificadorPagamento = '{{ identificadorPagamento }}';
     const verificaStatusUrl = '{{ verificaStatusUrl }}';
-    const languageParam = typeof efiLanguage !== 'undefined' ? `&language=${efiLanguage}` : '';
 
     function verificarStatusPagamento() {
       fetch(`${verificaStatusUrl}&identificadorPagamento=${encodeURIComponent(identificadorPagamento)}`)
         .then(response => response.json())
         .then(data => {
           if (data && data.status === 'aceito') {
-            window.location.href = `index.php?route=checkout/success&language=${languageParam}`;
+            window.location.href = 'index.php?route=checkout/success&language={{ config_language }}';
+
           } else if (data && data.status === 'erro') {
             const container = document.querySelector('.container');
             container.innerHTML = `<div class="alert alert-danger" role="alert">${data.mensagem}</div>`;
