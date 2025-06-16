@@ -85,7 +85,7 @@ class EfiPixWebhook extends \Opencart\System\Engine\Controller
 
                     // Atualizar status do pedido no OpenCart
                     if ($order_status_id) {
-                        $this->model_checkout_order->addHistory($order_info['order_id'], $order_status_id, 'Pagamento confirmado via Pix');
+                        $this->model_checkout_order->addHistory($order_info['order_id'], $order_status_id, 'Pagamento confirmado via Pix', true);
                     }
                 } catch (\Exception $e) {
                     $this->log->write("Erro ao processar transação Pix: " . $e->getMessage());
