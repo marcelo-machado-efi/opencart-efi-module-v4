@@ -70,7 +70,7 @@ class EfiOpenFinanceWebhook extends \Opencart\System\Engine\Model
 
             $body = [
                 'redirectURL'      => $redirectUrl,
-                'webhookURL'       => 'https://webhook.site/ca4d310d-e708-4e26-94b3-a914f3167928',
+                'webhookURL'       => 'https://webhook.site/fc0f586a-91b9-4c0d-9496-af68db1abe67',
                 'webhookSecurity'  => [
                     'type' => 'hmac',
                     'hash' => $hmacHash
