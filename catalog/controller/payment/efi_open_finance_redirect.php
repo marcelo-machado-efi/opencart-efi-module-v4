@@ -16,7 +16,18 @@ class EfiOpenFinanceRedirect extends \Opencart\System\Engine\Controller
             $data['mensagem '] = $this->language->get('text_description_open_finance_redirect');
 
             // Adiciona a URL de verificação do status
-            $data['verificaStatusUrl'] = $this->url->link('extension/efi/payment/efiopenfinance.detailopenfinance', 'language=' . $this->config->get('config_language'));
+            $data['verificaStatusUrl'] = urldecode(
+                html_entity_decode(
+                    $this->url->link(
+                        'extension/efi/payment/efi_open_finance.detailopenfinance',
+                        'language=' . $this->config->get('config_language'),
+                        true
+                    ),
+                    ENT_QUOTES,
+                    'UTF-8'
+                )
+            );
+
 
             // Carrega header e footer
             $data['header'] = $this->load->controller('common/header');
