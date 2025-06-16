@@ -15,6 +15,8 @@ class EfiOpenFinanceRedirect extends \Opencart\System\Engine\Controller
             $data['logo'] = $this->getImagePath('efi_logo.png');
             $data['mensagem '] = $this->language->get('text_description_open_finance_redirect');
 
+            // Adiciona a URL de verificação do status
+            $data['verificaStatusUrl'] = $this->url->link('extension/efi/payment/efiopenfinance.detailopenfinance', 'language=' . $this->config->get('config_language'));
 
             // Carrega header e footer
             $data['header'] = $this->load->controller('common/header');
@@ -40,6 +42,7 @@ class EfiOpenFinanceRedirect extends \Opencart\System\Engine\Controller
             );
         }
     }
+
 
     private function logError(string $message): void
     {
