@@ -13,17 +13,17 @@ class EfiBillet extends \Opencart\System\Engine\Model
     public function generateBilletCharge(array $customer, float $amount, string $order_id, array $settings): array
     {
         try {
-            $options       = EfiConfigHelper::getEfiConfig($settings);
-            $customer_data = $this->getFormattedCustomer($customer);
-            $expireAt      = $this->getExpireAt();
-            $metadata      = $this->getMetadata($order_id);
+            $options        = EfiConfigHelper::getEfiConfig($settings);
+            $customer_data  = $this->getFormattedCustomer($customer);
+            $expireAt       = $this->getExpireAt();
+            $metadata       = $this->getMetadata($order_id);
             $configurations = $this->getConfigurations();
             $message        = $this->getMessage();
             $discount       = $this->getDiscount($amount);
 
             $paymentData = [
-                'customer'   => $customer_data,
-                'expire_at'  => $expireAt
+                'customer'  => $customer_data,
+                'expire_at' => $expireAt
             ];
 
             if (!empty($configurations)) {
@@ -52,8 +52,8 @@ class EfiBillet extends \Opencart\System\Engine\Model
                 ]
             ];
 
-            $efiPay    = new EfiPay($options);
-            $charge    = $efiPay->createOneStepCharge([], $body);
+            $efiPay     = new EfiPay($options);
+            $charge     = $efiPay->createOneStepCharge([], $body);
             $chargeData = $charge['data'];
 
             $this->logInfo(json_encode($chargeData));
@@ -77,7 +77,7 @@ class EfiBillet extends \Opencart\System\Engine\Model
     private function getFormattedCustomer(array $customer): array
     {
         $document = preg_replace('/\D/', '', $customer['document']);
-        $base = [];
+        $base     = [];
 
         if (strlen($document) === 11) {
             $base['name'] = $customer['name'];
@@ -145,6 +145,8 @@ class EfiBillet extends \Opencart\System\Engine\Model
         $interest = $this->config->get('payment_efi_billet_interest');
 
         $configurations = [];
+        $configurations['fine'] = 0;
+        $configurations['interest'] = 0;
 
         if ($fine !== '' && $fine !== null) {
             $configurations['fine'] = (int) $fine;
@@ -168,27 +170,29 @@ class EfiBillet extends \Opencart\System\Engine\Model
         $discount = [];
 
         if (str_ends_with($discountValue, '%')) {
-            $numericValue = (float) rtrim($discountValue, '%');
-            $discount['type'] = 'percentage';
+            $numericValue      = (float) rtrim($discountValue, '%');
+            $discount['type']  = 'percentage';
             $discount['value'] = (int) ($numericValue * 100);
         } else {
-            $numericValue = (float) str_replace(',', '.', $discountValue);
-            $discount['type'] = 'currency';
+            $numericValue      = (float) str_replace(',', '.', $discountValue);
+            $discount['type']  = 'currency';
             $discount['value'] = (int) ($numericValue * 100);
         }
+
+        $this->logInfo("Desconto aplicado: tipo={$discount['type']}, valor={$discount['value']} (entrada: {$discountValue})");
 
         return $discount;
     }
 
     private function logError(string $message): void
     {
-        $log = new \Opencart\System\Library\Log('efi.log');
+        $log = new \Opencart\System\Library\Log('efi_charge_billet.log');
         $log->write('[ERROR] ' . $message);
     }
 
     private function logInfo(string $message): void
     {
-        $log = new \Opencart\System\Library\Log('efi.log');
+        $log = new \Opencart\System\Library\Log('efi_charge_billet.log');
         $log->write('[INFO] ' . $message);
     }
 }
