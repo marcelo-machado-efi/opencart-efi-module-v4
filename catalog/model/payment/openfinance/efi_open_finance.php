@@ -4,28 +4,36 @@ namespace Opencart\Catalog\Model\Extension\Efi\Payment\OpenFinance;
 
 require_once DIR_EXTENSION . 'efi/library/vendor/autoload.php';
 
-
 use Opencart\Extension\Efi\Library\EfiConfigHelper;
 use Efi\EfiPay;
 use Exception;
 
 class EfiOpenFinance extends \Opencart\System\Engine\Model
 {
-    public function generatePayment(string $customer_document_cpf, string $customer_document_cnpj, string $customer_bank, float $amount, string $order_id, array $settings): array
-    {
+    /**
+     * Gera um pagamento Pix via Open Finance.
+     */
+    public function generatePayment(
+        string $customer_document_cpf,
+        string $customer_document_cnpj,
+        string $customer_bank,
+        float $amount,
+        string $order_id,
+        array $settings
+    ): array {
         try {
             // Configurações Efí
             $options = EfiConfigHelper::getEfiConfig($settings);
             $options["headers"] = [
-                "x-idempotency-key" => bin2hex(random_bytes(18)) // ID único
+                "x-idempotency-key" => bin2hex(random_bytes(18))
             ];
 
-            // Participante pagador
+            // Monta dados do pagador
             $pagador = [
                 "idParticipante" => $customer_bank
             ];
 
-            // Adiciona CPF (sempre enviado)
+            // CPF obrigatório
             $cpf = preg_replace('/\D/', '', $customer_document_cpf);
             if (strlen($cpf) === 11) {
                 $pagador["cpf"] = $cpf;
@@ -33,7 +41,7 @@ class EfiOpenFinance extends \Opencart\System\Engine\Model
                 throw new Exception("CPF inválido.");
             }
 
-            // Adiciona CNPJ (se fornecido e válido)
+            // CNPJ opcional
             $cnpj = preg_replace('/\D/', '', $customer_document_cnpj);
             if (!empty($cnpj)) {
                 if (strlen($cnpj) === 14) {
@@ -43,27 +51,31 @@ class EfiOpenFinance extends \Opencart\System\Engine\Model
                 }
             }
 
-            // Dados do favorecido
+            // Favorecido
             $favorecido = [
-                "chave" => $settings['payment_efi_open_finance_key']
+                "chave" => $settings['payment_efi_open_finance_key'] ?? ''
             ];
+
+            // Desconto, se houver
+            $discount = $settings['payment_efi_open_finance_discount'] ?? '';
+            $valorFinal = $this->aplicarDesconto($amount, $discount);
 
             // Corpo da requisição
             $body = [
                 "pagador" => $pagador,
                 "favorecido" => $favorecido,
                 "pagamento" => [
-                    "valor" => number_format($amount, 2, '.', ''),
+                    "valor" => number_format($valorFinal, 2, '.', ''),
                     "infoPagador" => "Pagamento do Pedido #{$order_id}",
                     "idProprio" => "OC-Order-{$order_id}"
                 ]
             ];
 
-            // Envia para a API
+            // Envia para API
             $efiPay = new EfiPay($options);
             $response = $efiPay->ofStartPixPayment([], $body);
 
-            if (!isset($response['redirectURI']) || !isset($response['identificadorPagamento'])) {
+            if (empty($response['redirectURI']) || empty($response['identificadorPagamento'])) {
                 throw new Exception('Resposta inesperada da API Efí.');
             }
 
@@ -81,6 +93,9 @@ class EfiOpenFinance extends \Opencart\System\Engine\Model
         }
     }
 
+    /**
+     * Consulta o status de um pagamento.
+     */
     public function getDetailPayment(string $identificadorPagamento, array $settings): array
     {
         try {
@@ -102,6 +117,38 @@ class EfiOpenFinance extends \Opencart\System\Engine\Model
         }
     }
 
+    /**
+     * Aplica desconto no valor informado.
+     * Se o desconto termina com %, aplica percentual. Senão, valor fixo.
+     */
+    private function aplicarDesconto(float $valorOriginal, string $desconto): float
+    {
+        $desconto = trim($desconto);
+
+        if ($desconto === '' || $desconto === '0') {
+            return $valorOriginal;
+        }
+
+        if (str_ends_with($desconto, '%')) {
+            $percent = floatval(str_replace('%', '', $desconto));
+            if ($percent > 0 && $percent < 100) {
+                $valorFinal = $valorOriginal - ($valorOriginal * $percent / 100);
+                return max($valorFinal, 0.01);
+            }
+        } else {
+            $descontoValor = floatval(str_replace(',', '.', $desconto));
+            if ($descontoValor > 0 && $descontoValor < $valorOriginal) {
+                return $valorOriginal - $descontoValor;
+            }
+        }
+
+        // Se o desconto for inválido, ignora e retorna o valor original
+        return $valorOriginal;
+    }
+
+    /**
+     * Log de erro.
+     */
     private function logError(string $message): void
     {
         $log = new \Opencart\System\Library\Log('efi_open_finance.log');
