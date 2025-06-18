@@ -37,6 +37,8 @@ class CommonValidations {
 
     static isValidCartaoCredito(value) {
         value = value.replace(/\D/g, '');
+        let result = CommonValidations.luhnCheck(value);
+        console.log('RESULTADO DE VALIDAÇÃO DO INPUT DE CARTÃO:', result);
         return CommonValidations.luhnCheck(value);
     }
 
