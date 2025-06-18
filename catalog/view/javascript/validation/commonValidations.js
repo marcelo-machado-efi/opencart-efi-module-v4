@@ -37,9 +37,13 @@ class CommonValidations {
 
     static isValidCartaoCredito(value) {
         value = value.replace(/\D/g, '');
+
+        // Se o campo estiver vazio, já retorna falso
+        if (!value) return false;
+
         let result = CommonValidations.luhnCheck(value);
         console.log('RESULTADO DE VALIDAÇÃO DO INPUT DE CARTÃO:', result);
-        return CommonValidations.luhnCheck(value);
+        return result;
     }
 
     static luhnCheck(num) {
@@ -167,7 +171,6 @@ class CommonValidations {
                 isValid = CommonValidations.isValidCartaoVencimento(input.value);
                 errorMessage = 'Data inválida ou vencimento já expirado.';
                 break;
-
             default:
                 console.warn(`Nenhuma validação definida para: ${maskType}`);
                 return;
