@@ -24,6 +24,43 @@ class EfiOpenFinanceWebhook extends \Opencart\System\Engine\Controller
         try {
             $this->response->addHeader('Content-Type: application/json');
 
+            // 1. Validação HMAC via query param ?hmac=
+            $hmacReceived = $this->request->get['hmac'] ?? '';
+            if (!$hmacReceived) {
+                $this->log->write('HMAC não informado na query.');
+                $this->response->addHeader($this->request->server['SERVER_PROTOCOL'] . ' 403 Forbidden');
+                $this->response->setOutput('HMAC ausente');
+                return;
+            }
+
+            // 2. Monte a URL exatamente como cadastrada (sem hmac!)
+            $baseUrl = (defined('HTTPS_CATALOG') && HTTPS_CATALOG)
+                ? rtrim(HTTPS_CATALOG, '/')
+                : (
+                    (isset($this->request->server['HTTPS']) && $this->request->server['HTTPS'] === 'on'
+                        ? 'https' : 'http') . '://' . $this->request->server['HTTP_HOST']
+                );
+            $language = $this->request->get['language'] ?? $this->config->get('config_language');
+            $webhookUrlBase = $baseUrl . '/index.php?route=extension/efi/payment/efi_open_finance_webhook&language=' . $language;
+
+            // 3. Recupera o segredo da config (ajuste se necessário)
+            $clientId = $this->config->get('payment_efi_client_id_production');
+            if (!$clientId) {
+                $this->log->write('Client ID não encontrado na configuração.');
+                $this->response->addHeader($this->request->server['SERVER_PROTOCOL'] . ' 500 Internal Server Error');
+                $this->response->setOutput('Configuração do módulo ausente');
+                return;
+            }
+            $hmacExpected = hash_hmac('sha256', $webhookUrlBase, $clientId);
+
+            // 4. Compara os HMACs
+            if (!hash_equals($hmacExpected, $hmacReceived)) {
+                $this->log->write("HMAC inválido. Recebido: $hmacReceived | Esperado: $hmacExpected | Base: $webhookUrlBase | ClientId: $clientId");
+                $this->response->addHeader($this->request->server['SERVER_PROTOCOL'] . ' 403 Forbidden');
+                $this->response->setOutput('HMAC inválido');
+                return;
+            }
+
             $input = file_get_contents('php://input');
             $webhookData = json_decode($input, true);
 
