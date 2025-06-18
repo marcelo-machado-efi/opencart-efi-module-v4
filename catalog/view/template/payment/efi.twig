@@ -17,8 +17,20 @@
 	<div class="row text-center mb-4">
 		<strong class="fs-5">{{ efi_payment_description }}</strong>
 	</div>
+
+	<!-- Alerta de desconto destacado -->
 	<div class="row justify-content-center my-3">
-		<span class="badge bg-success col-6 fs-6">10% de desconto no Pix</span>
+		<div class="alert alert-success d-flex align-items-center justify-content-center col-12 col-md-8 gap-2 p-2 mb-0" style="font-size:1.15rem;">
+			<!-- Ícone Bootstrap SVG Check Circle -->
+			<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="bi bi-patch-check-fill me-2" viewBox="0 0 16 16">
+			  <path d="M10.072.227c-.54-.267-1.604-.48-2.144 0-.53.477-.669 1.094-1.113 1.513C6.07 2.22 5.254 2.17 4.698 2.495c-.548.327-.82 1.02-1.268 1.352C2.65 4.44 1.856 4.12 1.328 4.507c-.53.388-.563 1.241-.863 1.768-.3.526-1.02.88-1.02 1.495 0 .615.719.969 1.02 1.495.3.526.333 1.38.863 1.768.528.387 1.322.066 1.702.66.448.332.72 1.025 1.268 1.352.556.325 1.372.275 1.917-.255.444-.419.583-1.036 1.113-1.513.54-.48 1.604-.267 2.144 0 .53.266.67.883 1.114 1.302.545.53 1.36.58 1.917.255.548-.327.82-1.02 1.267-1.352.38-.594 1.174-.273 1.702-.66.53-.388.563-1.241.863-1.768.3-.526 1.02-.88 1.02-1.495 0-.615-.719-.969-1.02-1.495-.3-.526-.333-1.38-.863-1.768-.528-.387-1.322-.067-1.702-.66-.448-.332-.72-1.025-1.267-1.352-.557-.325-1.372-.275-1.917.255-.444.419-.584 1.036-1.114 1.513zM6.854 10.646a.5.5 0 0 1-.708 0L4.5 9l-.708.708a.5.5 0 0 1-.708-.708l1-1a.5.5 0 0 1 .708 0l1.5 1.5a.5.5 0 0 1 0 .708zm1.292-6.292a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 5.207l-2.146 2.147a.5.5 0 0 1-.708-.708l3-3z"/>
+			</svg>
+			<strong>
+				Você ganhou <span class="text-decoration-underline">10% de desconto</span> no pagamento via Pix!
+				<!-- Se quiser mostrar valor real, pode usar: -->
+				<!-- (Valor descontado: <span class="fw-bold">R$ 25,00</span>) -->
+			</strong>
+		</div>
 	</div>
 
 	<div class="row justify-content-between">
@@ -101,4 +113,3 @@
 		{% endfor %}
 	]);
 </script>
-
