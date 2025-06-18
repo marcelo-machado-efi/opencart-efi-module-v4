@@ -68,6 +68,7 @@ class Efi extends \Opencart\System\Engine\Controller
 		$this->load->model('extension/efi/payment/pix/efi_pix_inputs');
 		$data['inputs'] = $this->model_extension_efi_payment_pix_efi_pix_inputs->getEntryFormatted($this->language);
 		$data['btn_confirm_text'] = $this->language->get('btn_confirm_text_pix');
+		$data['btn_confirm_icon'] = 'pix';
 		$data['efi_payment_id_form'] = 'efi-pix-form';
 		$data['efi_payment_description'] = $this->language->get('text_description_pix');
 		$data['command_init_form_payment'] = 'new PixFormHandler();';
