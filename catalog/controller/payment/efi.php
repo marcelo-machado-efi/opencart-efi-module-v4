@@ -68,7 +68,7 @@ class Efi extends \Opencart\System\Engine\Controller
 		$this->load->model('extension/efi/payment/pix/efi_pix_inputs');
 		$data['inputs'] = $this->model_extension_efi_payment_pix_efi_pix_inputs->getEntryFormatted($this->language);
 		$data['btn_confirm_text'] = $this->language->get('btn_confirm_text_pix');
-		$data['btn_confirm_icon'] = '<i class="fa-brands fa-pix"></i>';
+		$data['btn_confirm_icon'] = '<i class="fa-brands me-1 fa-pix"></i>';
 		$data['efi_payment_id_form'] = 'efi-pix-form';
 		$data['efi_payment_description'] = $this->language->get('text_description_pix');
 		$data['command_init_form_payment'] = 'new PixFormHandler();';
@@ -81,7 +81,7 @@ class Efi extends \Opencart\System\Engine\Controller
 		$this->load->model('extension/efi/payment/billet/efi_billet_inputs');
 		$data['inputs'] = $this->model_extension_efi_payment_billet_efi_billet_inputs->getEntryFormatted($this->language);
 		$data['btn_confirm_text'] = $this->language->get('btn_confirm_text_billet');
-		$data['btn_confirm_icon'] = '<i class="fa-solid fa-money-check-dollar"></i>';
+		$data['btn_confirm_icon'] = '<i class="fa-solid me-1 fa-money-check-dollar"></i>';
 		$data['efi_payment_id_form'] = 'efi-billet-form';
 		$data['efi_payment_description'] = $this->language->get('text_description_billet');
 		$data['command_init_form_payment'] = 'new BilletFormHandler();';
@@ -94,7 +94,7 @@ class Efi extends \Opencart\System\Engine\Controller
 		$this->load->model('extension/efi/payment/card/efi_card_inputs');
 		$data['inputs'] = $this->model_extension_efi_payment_card_efi_card_inputs->getEntryFormatted($this->language);
 		$data['btn_confirm_text'] = $this->language->get('btn_confirm_text_card');
-		$data['btn_confirm_icon'] = '<i class="fa-solid fa-credit-card"></i>';
+		$data['btn_confirm_icon'] = '<i class="fa-solid me-1 fa-credit-card"></i>';
 		$data['efi_payment_id_form'] = 'efi-card-form';
 		$data['efi_payment_description'] = $this->language->get('text_description_card');
 
@@ -118,7 +118,7 @@ class Efi extends \Opencart\System\Engine\Controller
 		$data['inputs'] = $this->model_extension_efi_payment_openfinance_efi_open_finance_inputs->getEntryFormatted($this->language, $settings);
 
 		$data['btn_confirm_text'] = $this->language->get('btn_confirm_text_open_finance');
-		$data['btn_confirm_icon'] = '<i class="fa-solid fa-arrow-right"></i>';
+		$data['btn_confirm_icon'] = '<i class="fa-solid me-1 fa-arrow-right"></i>';
 		$data['efi_payment_id_form'] = 'efi-open-finance-form';
 		$data['efi_payment_description'] = $this->language->get('text_description_open_finance');
 		$data['command_init_form_payment'] = 'new OpenFinanceFormHandler();';
