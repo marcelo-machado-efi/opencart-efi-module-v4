@@ -7,7 +7,7 @@
     </div>
   {% else %}
 
-    <div class="row justify-content-center ">
+    <div class="row justify-content-center">
       <img src="{{ logo }}" class="img-fluid col-lg-3 col-md-5 col-7" alt="Logo da empresa">
     </div>
 
@@ -50,6 +50,21 @@
 
     verificarStatusPagamento();
     {% endif %}
+  });
+</script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    if (window.innerWidth <= 768) { // Aplica apenas em telas pequenas (ex: mobile)
+      const header = document.querySelector('header');
+      const footer = document.querySelector('footer');
+      const main = document.querySelector('main');
+
+      const headerHeight = header?.offsetHeight || 0;
+      const footerHeight = footer?.offsetHeight || 0;
+
+      main.style.marginBottom = `${footerHeight + (headerHeight / 4)}px`;
+    }
   });
 </script>
 
