@@ -11,6 +11,7 @@ class Efi extends \Opencart\System\Engine\Controller
 		try {
 			$this->load->language('extension/efi/payment/efi');
 
+			// Recursos comuns
 			$this->document->addStyle('extension/efi/catalog/view/stylesheet/fontawesome/css/all.min.css');
 			$this->document->addStyle('extension/efi/catalog/view/stylesheet/common/color-brand.css');
 			$this->document->addScript('extension/efi/catalog/view/javascript/validation/commonValidations.js');
@@ -21,10 +22,14 @@ class Efi extends \Opencart\System\Engine\Controller
 			$data['payment_efi_status'] = $this->config->get('payment_efi_status');
 			$data['img_logo_url'] = $this->getImagePath('efi_logo.png');
 			$total = $this->cart->getTotal();
-			$settings = $this->config->get('payment_efi');
+
+			// Carrega sempre o array completo das configs para passar ao helper
+			$this->load->model('setting/setting');
+			$settings = $this->model_setting_setting->getSetting('payment_efi');
+
 			$methodCode = $this->session->data['payment_method']['code'] ?? '';
 
-			// Limpa tabela de desconto inicialmente
+			// Inicialização padrão (cartão ou fallback)
 			$data['total'] = 'R$ ' . number_format($total, 2, ',', '.');
 			$data['msg_desconto'] = '';
 			$data['value_desconto'] = 'R$ 0,00';
@@ -35,18 +40,22 @@ class Efi extends \Opencart\System\Engine\Controller
 					$this->loadPixResources($data);
 					$data = array_merge($data, EfiDiscountHelper::getDiscountTableData($total, 'payment_efi_pix_discount', $settings));
 					break;
+
 				case 'efi.efi_billet':
 					$this->loadBilletResources($data);
 					$data = array_merge($data, EfiDiscountHelper::getDiscountTableData($total, 'payment_efi_billet_discount', $settings));
 					break;
+
 				case 'efi.efi_open_finance':
 					$this->loadOpenFinanceResources($data);
 					$data = array_merge($data, EfiDiscountHelper::getDiscountTableData($total, 'payment_efi_open_finance_discount', $settings));
 					break;
+
 				case 'efi.efi_card':
 					$this->loadCardResources($data);
-					// Cartão não tem desconto, mantém padrão (já setado acima)
+					// Cartão não tem desconto, mantém padrão
 					break;
+
 				default:
 					$this->logError("Método de pagamento não reconhecido: " . $methodCode);
 					return '';
@@ -73,7 +82,6 @@ class Efi extends \Opencart\System\Engine\Controller
 		$log->write($message);
 	}
 
-	// Os métodos abaixo permanecem iguais
 	private function loadPixResources(array &$data): void
 	{
 		$this->load->model('extension/efi/payment/pix/efi_pix_inputs');
