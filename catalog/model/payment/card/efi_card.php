@@ -172,7 +172,7 @@ class EfiCard extends \Opencart\System\Engine\Model
      */
     private function logError(string $message): void
     {
-        $log = new \Opencart\System\Library\Log('efi.log');
+        $log = new \Opencart\System\Library\Log('efi_card.log');
         $log->write($message);
     }
 
