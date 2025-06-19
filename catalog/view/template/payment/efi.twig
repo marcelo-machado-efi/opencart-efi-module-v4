@@ -25,15 +25,15 @@
 				<tbody>
 					<tr>
 						<td class="fw-bold">Total</td>
-						<td class="text-end">R$ 100,00</td>
+						<td class="text-end">{{ total }}</td>
 					</tr>
 					<tr>
-						<td class="fw-bold">Desconto</td>
-						<td class="text-end text-success">- R$ 10,00</td>
+						<td class="fw-bold">{{msg_desconto}}</td>
+						<td class="text-end text-success">-{{value_desconto}}</td>
 					</tr>
 					<tr>
 						<td class="fw-bold">Total com desconto</td>
-						<td class="text-end fw-bold">R$ 90,00</td>
+						<td class="text-end fw-bold">{{total_value_with_discount}}</td>
 					</tr>
 				</tbody>
 			</table>
