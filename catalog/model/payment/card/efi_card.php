@@ -18,18 +18,16 @@ class EfiCard extends \Opencart\System\Engine\Model
      * @param float $amount Valor da cobrança.
      * @param string $order_id ID do pedido.
      * @param array $settings Configurações da conta EfiPay.
+     * @param float $shipping Valor do frete (em reais, opcional).
      * @return array Resultado da operação.
      */
-    public function generateCardCharge(array $customer, array $card, float $amount, string $order_id, array $settings): array
+    public function generateCardCharge(array $customer, array $card, float $amount, string $order_id, array $settings, float $shipping = 0.0): array
     {
         try {
-            // Configuração da API do EfiPay
             $options = EfiConfigHelper::getEfiConfig($settings);
 
-            // Dados do cliente formatados
             $customer_data = $this->getFormattedCustomer($customer);
 
-            // Corpo da requisição
             $body = [
                 'items' => [
                     [
@@ -47,12 +45,16 @@ class EfiCard extends \Opencart\System\Engine\Model
                 ]
             ];
 
-            // Inicializa a API do EfiPay
-            $efiPay = new EfiPay($options);
+            // Adiciona o frete se houver
+            $shippings = $this->getShippings($shipping);
+            if (!empty($shippings)) {
+                $body['shippings'] = $shippings;
+            }
 
-            // Cria a cobrança
+            $efiPay = new EfiPay($options);
             $charge = $efiPay->createOneStepCharge([], $body);
             $chargeData = $charge['data'];
+
             if ($chargeData['status'] == 'approved') {
                 $response = [
                     'success' => true,
@@ -80,6 +82,25 @@ class EfiCard extends \Opencart\System\Engine\Model
     }
 
     /**
+     * Retorna o array de shippings para enviar na API.
+     *
+     * @param float $shipping Valor do frete (em reais)
+     * @return array
+     */
+    public function getShippings(float $shipping): array
+    {
+        if ($shipping > 0) {
+            return [
+                [
+                    'name' => 'frete',
+                    'value' => intval($shipping * 100) // valor em centavos
+                ]
+            ];
+        }
+        return [];
+    }
+
+    /**
      * Retentativa de pagamento via cartão de crédito usando a API do EfiPay.
      *
      * @param string $charge_id      ID da cobrança original.
@@ -95,9 +116,7 @@ class EfiCard extends \Opencart\System\Engine\Model
             $params = [
                 "id" => $charge_id
             ];
-            // FORMATA os dados crus do cliente para o formato da API Efí
             $customer_data = $this->getFormattedCustomer($customer);
-
 
             $body = [
                 'payment' => [

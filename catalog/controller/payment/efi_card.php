@@ -25,6 +25,17 @@ class EfiCard extends \Opencart\System\Engine\Controller
                 throw new \Exception('Pedido não encontrado.');
             }
             $amount = (float) $order_info['total'];
+
+            // Busca valor do frete do pedido (shipping)
+            $shipping_value = 0.00;
+            if (isset($order_info['shipping_cost']) && $order_info['shipping_cost'] > 0) {
+                $shipping_value = (float) $order_info['shipping_cost'];
+            } elseif (isset($order_info['shipping']) && $order_info['shipping'] > 0) {
+                $shipping_value = (float) $order_info['shipping'];
+            } elseif (isset($order_info['shipping_method']) && isset($order_info['shipping_method']['cost'])) {
+                $shipping_value = (float) $order_info['shipping_method']['cost'];
+            }
+
             $this->load->model('setting/setting');
             $settings = $this->model_setting_setting->getSetting('payment_efi');
 
@@ -50,7 +61,9 @@ class EfiCard extends \Opencart\System\Engine\Controller
             $this->load->model('extension/efi/payment/card/efi_card');
 
             if ((int)$order_info['order_status_id'] !== $order_status_id) {
-                $charge_data = $this->model_extension_efi_payment_card_efi_card->generateCardCharge($customer, $card, $amount, $order_id, $settings);
+                // Envia apenas o valor do frete, ou zero
+                $charge_data = $this->model_extension_efi_payment_card_efi_card
+                    ->generateCardCharge($customer, $card, $amount, $order_id, $settings, $shipping_value);
 
                 if (!$charge_data['success']) {
                     throw new \Exception($charge_data['error']);
