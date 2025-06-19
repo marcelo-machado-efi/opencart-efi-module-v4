@@ -24,8 +24,6 @@ class EfiCard extends \Opencart\System\Engine\Controller
             if (!$order_info) {
                 throw new \Exception('Pedido não encontrado.');
             }
-            $order_status_id = 2;
-            $this->model_checkout_order->addHistory($order_id, $order_status_id, 'Cobrança via cartão aguardando confirmação.', false);
             $amount = (float) $order_info['total'];
             $this->load->model('setting/setting');
             $settings = $this->model_setting_setting->getSetting('payment_efi');
@@ -42,25 +40,74 @@ class EfiCard extends \Opencart\System\Engine\Controller
                 'installments' => $this->request->post['payment_efi_customer_card_installments'] ?? 1
             ];
 
-
             if (empty($customer['name']) || empty($customer['document']) || empty($card['token'])) {
                 $this->logError(json_encode($customer));
                 $this->logError(json_encode($card));
                 throw new \Exception('Dados obrigatórios ausentes.');
             }
 
+            $order_status_id = 2;
             $this->load->model('extension/efi/payment/card/efi_card');
-            $charge_data = $this->model_extension_efi_payment_card_efi_card->generateCardCharge($customer, $card, $amount, $order_id, $settings);
 
-            if (!$charge_data['success']) {
-                throw new \Exception($charge_data['error']);
+            if ((int)$order_info['order_status_id'] !== $order_status_id) {
+
+
+                $charge_data = $this->model_extension_efi_payment_card_efi_card->generateCardCharge($customer, $card, $amount, $order_id, $settings);
+
+                if (!$charge_data['success']) {
+                    throw new \Exception($charge_data['error']);
+                }
+
+                $data = [
+                    'message' => $charge_data['message'],
+                    'charge_id' => $charge_data['charge_id'],
+                    'status' => $charge_data['status']
+                ];
+                $this->model_checkout_order->addHistory(
+                    $order_id,
+                    $order_status_id,
+                    'Cobrança via cartão aguardando confirmação:' . $charge_data['charge_id'],
+                    false
+                );
+            } else {
+                $this->load->model('checkout/order');
+                $histories = $this->model_checkout_order->getHistory($order_id, 0, 100);
+
+                $previous_charge_id = null;
+                foreach ($histories as $history) {
+                    if (
+                        (int)$history['order_status_id'] === $order_status_id &&
+                        strpos($history['comment'], 'Cobrança via cartão aguardando confirmação:') === 0
+                    ) {
+                        $previous_charge_id = trim(str_replace('Cobrança via cartão aguardando confirmação:', '', $history['comment']));
+                        break;
+                    }
+                }
+
+                if (!$previous_charge_id) {
+                    throw new \Exception('Não foi possível recuperar a cobrança anterior para retentativa.');
+                }
+
+                // Chama o retry
+                $retry_data = $this->model_extension_efi_payment_card_efi_card->cardPaymentRetry(
+                    $previous_charge_id,
+                    $customer,
+                    $card['token'],
+                    $settings
+                );
+
+                $charge_data = [
+                    'message'   => $retry_data['message'] ?? '',
+                    'charge_id' => $previous_charge_id,
+                    'status'    => $retry_data['status'] ?? null
+                ];
             }
 
-            $data = [
-                'message' => $charge_data['message'],
-                'charge_id' => $charge_data['charge_id'],
-                'status' => $charge_data['status']
-            ];
+
+
+
+
+
             if ($charge_data['status'] == 'approved') {
                 $this->model_checkout_order->addHistory(
                     $order_id,
@@ -79,8 +126,6 @@ class EfiCard extends \Opencart\System\Engine\Controller
                 $data['success'] = false;
             }
 
-
-            // $view = $this->load->view('extension/efi/payment/efi_success_ajax', $data);
             $this->response->addHeader('Content-Type: application/json');
             $this->response->setOutput(json_encode($data));
         } catch (\Exception $e) {
