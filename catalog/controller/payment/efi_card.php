@@ -50,8 +50,6 @@ class EfiCard extends \Opencart\System\Engine\Controller
             $this->load->model('extension/efi/payment/card/efi_card');
 
             if ((int)$order_info['order_status_id'] !== $order_status_id) {
-
-
                 $charge_data = $this->model_extension_efi_payment_card_efi_card->generateCardCharge($customer, $card, $amount, $order_id, $settings);
 
                 if (!$charge_data['success']) {
@@ -70,8 +68,8 @@ class EfiCard extends \Opencart\System\Engine\Controller
                     false
                 );
             } else {
-                $this->load->model('checkout/order');
-                $histories = $this->model_checkout_order->getHistory($order_id, 0, 100);
+                // Busca histórico direto do banco (método custom abaixo)
+                $histories = $this->getOrderHistories($order_id, 0, 100);
 
                 $previous_charge_id = null;
                 foreach ($histories as $history) {
@@ -103,11 +101,6 @@ class EfiCard extends \Opencart\System\Engine\Controller
                 ];
             }
 
-
-
-
-
-
             if ($charge_data['status'] == 'approved') {
                 $this->model_checkout_order->addHistory(
                     $order_id,
@@ -136,6 +129,24 @@ class EfiCard extends \Opencart\System\Engine\Controller
             $this->response->addHeader('Content-Type: text/html; charset=UTF-8');
             $this->response->setOutput($view);
         }
+    }
+
+    /**
+     * Recupera o histórico de status do pedido diretamente do banco de dados.
+     *
+     * @param int $order_id
+     * @param int $start
+     * @param int $limit
+     * @return array
+     */
+    private function getOrderHistories($order_id, $start = 0, $limit = 100)
+    {
+        $sql = "SELECT * FROM `" . DB_PREFIX . "order_history` WHERE `order_id` = '" . (int)$order_id . "' ORDER BY `date_added` DESC";
+        if ($limit) {
+            $sql .= " LIMIT " . (int)$start . "," . (int)$limit;
+        }
+        $query = $this->db->query($sql);
+        return $query->rows;
     }
 
     private function logError(string $message): void
