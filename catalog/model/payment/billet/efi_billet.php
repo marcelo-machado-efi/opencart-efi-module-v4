@@ -5,12 +5,13 @@ namespace Opencart\Catalog\Model\Extension\Efi\Payment\Billet;
 require_once DIR_EXTENSION . 'efi/library/vendor/autoload.php';
 
 use Opencart\Extension\Efi\Library\EfiConfigHelper;
+use Opencart\Extension\Efi\Library\EfiShippingHelper;
 use Efi\EfiPay;
 use Exception;
 
 class EfiBillet extends \Opencart\System\Engine\Model
 {
-    public function generateBilletCharge(array $customer, float $amount, string $order_id, array $settings): array
+    public function generateBilletCharge(array $customer, float $amount, string $order_id, array $settings, array $order_info): array
     {
         try {
             $options        = EfiConfigHelper::getEfiConfig($settings);
@@ -51,6 +52,14 @@ class EfiBillet extends \Opencart\System\Engine\Model
                     'banking_billet' => $paymentData
                 ]
             ];
+
+            // Adiciona frete se houver
+            $shippings = EfiShippingHelper::getShippingsFromOrder($order_info);
+            $this->logInfo('SHIPPINGS: ' . json_encode($shippings));
+
+            if (!empty($shippings)) {
+                $body['shippings'] = $shippings;
+            }
 
             $efiPay     = new EfiPay($options);
             $charge     = $efiPay->createOneStepCharge([], $body);
@@ -141,12 +150,13 @@ class EfiBillet extends \Opencart\System\Engine\Model
 
     private function getConfigurations(): array
     {
-        $fine   = $this->config->get('payment_efi_billet_fine');
+        $fine     = $this->config->get('payment_efi_billet_fine');
         $interest = $this->config->get('payment_efi_billet_interest');
 
-        $configurations = [];
-        $configurations['fine'] = 0;
-        $configurations['interest'] = 0;
+        $configurations = [
+            'fine'     => 0,
+            'interest' => 0
+        ];
 
         if ($fine !== '' && $fine !== null) {
             $configurations['fine'] = (int) $fine;

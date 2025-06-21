@@ -26,17 +26,15 @@ class EfiBillet extends \Opencart\System\Engine\Controller
             }
 
             $amount = (float) $order_info['total'];
+
             $this->load->model('setting/setting');
             $settings = $this->model_setting_setting->getSetting('payment_efi');
 
             $customer = [
-                'name' => $this->request->post['payment_efi_customer_name'] ?? '',
+                'name'     => $this->request->post['payment_efi_customer_name'] ?? '',
                 'document' => $this->request->post['payment_efi_customer_document'] ?? '',
-                'email' => $this->request->post['payment_efi_customer_email'] ?? '',
+                'email'    => $this->request->post['payment_efi_customer_email'] ?? '',
             ];
-
-
-
 
             if (empty($customer['name']) || empty($customer['document'])) {
                 $this->logError(json_encode($customer));
@@ -44,23 +42,33 @@ class EfiBillet extends \Opencart\System\Engine\Controller
             }
 
             $this->load->model('extension/efi/payment/billet/efi_billet');
-            $charge_data = $this->model_extension_efi_payment_billet_efi_billet->generateBilletCharge($customer, $amount, $order_id, $settings);
+            $charge_data = $this->model_extension_efi_payment_billet_efi_billet
+                ->generateBilletCharge($customer, $amount, $order_id, $settings, $order_info);
 
             if (!$charge_data['success']) {
                 throw new \Exception($charge_data['error']);
             }
+
             $order_status_id = 2;
-            $this->model_checkout_order->addHistory($order_id, $order_status_id, 'Cobrança via boleto aguardando confirmação:<br><a href="' . $charge_data['link'] . '" class="btn btn-sm btn-primary mt-2" target="_blank">Visualizar Boleto</a>', true);
+            $this->model_checkout_order->addHistory(
+                $order_id,
+                $order_status_id,
+                'Cobrança via boleto aguardando confirmação:<br><a href="' . $charge_data['link'] . '" class="btn btn-sm btn-primary mt-2" target="_blank">Visualizar Boleto</a>',
+                true
+            );
+
             $data = [
                 'link_download_billet' => $charge_data['link']
             ];
+
             $this->cart->clear();
             unset($this->session->data['order_id']);
-            $this->response->addHeader('Content-Type: text/html; charset=UTF-8');
 
+            $this->response->addHeader('Content-Type: text/html; charset=UTF-8');
             $this->response->setOutput($this->load->view('extension/efi/payment/efi_script_billet', $data));
         } catch (\Exception $e) {
             $this->logError("Erro no processamento: " . $e->getMessage());
+
             $data['error'] = $e->getMessage();
             $view = $this->load->view('extension/efi/payment/efi_error_ajax', $data);
 
