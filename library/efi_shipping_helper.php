@@ -1,6 +1,6 @@
 <?php
 
-namespace Opencart\Extension\Efi\Helper;
+namespace Opencart\Extension\Efi\Library;
 
 class EfiShippingHelper
 {
