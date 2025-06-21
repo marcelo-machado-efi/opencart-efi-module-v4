@@ -24,30 +24,21 @@ class EfiCard extends \Opencart\System\Engine\Controller
             if (!$order_info) {
                 throw new \Exception('Pedido não encontrado.');
             }
-            $amount = (float) $order_info['total'];
 
-            // Busca valor do frete do pedido (shipping)
-            $shipping_value = 0.00;
-            if (isset($order_info['shipping_cost']) && $order_info['shipping_cost'] > 0) {
-                $shipping_value = (float) $order_info['shipping_cost'];
-            } elseif (isset($order_info['shipping']) && $order_info['shipping'] > 0) {
-                $shipping_value = (float) $order_info['shipping'];
-            } elseif (isset($order_info['shipping_method']) && isset($order_info['shipping_method']['cost'])) {
-                $shipping_value = (float) $order_info['shipping_method']['cost'];
-            }
+            $amount = (float) $order_info['total'];
 
             $this->load->model('setting/setting');
             $settings = $this->model_setting_setting->getSetting('payment_efi');
 
             $customer = [
-                'name' => $this->request->post['payment_efi_customer_name'] ?? '',
+                'name'     => $this->request->post['payment_efi_customer_name'] ?? '',
                 'document' => $this->request->post['payment_efi_customer_document'] ?? '',
-                'email' => $this->request->post['payment_efi_customer_email'] ?? '',
-                'phone' => $this->request->post['payment_efi_customer_phone'] ?? ''
+                'email'    => $this->request->post['payment_efi_customer_email'] ?? '',
+                'phone'    => $this->request->post['payment_efi_customer_phone'] ?? ''
             ];
 
             $card = [
-                'token' => $this->request->post['payment_efi_customer_card_payment_token'] ?? '',
+                'token'        => $this->request->post['payment_efi_customer_card_payment_token'] ?? '',
                 'installments' => $this->request->post['payment_efi_customer_card_installments'] ?? 1
             ];
 
@@ -61,19 +52,20 @@ class EfiCard extends \Opencart\System\Engine\Controller
             $this->load->model('extension/efi/payment/card/efi_card');
 
             if ((int)$order_info['order_status_id'] !== $order_status_id) {
-                // Envia apenas o valor do frete, ou zero
+                // Envia order_info completo para a model
                 $charge_data = $this->model_extension_efi_payment_card_efi_card
-                    ->generateCardCharge($customer, $card, $amount, $order_id, $settings, $shipping_value);
+                    ->generateCardCharge($customer, $card, $amount, $order_id, $settings, $order_info);
 
                 if (!$charge_data['success']) {
                     throw new \Exception($charge_data['error']);
                 }
 
                 $data = [
-                    'message' => $charge_data['message'],
+                    'message'   => $charge_data['message'],
                     'charge_id' => $charge_data['charge_id'],
-                    'status' => $charge_data['status']
+                    'status'    => $charge_data['status']
                 ];
+
                 $this->model_checkout_order->addHistory(
                     $order_id,
                     $order_status_id,
@@ -81,7 +73,7 @@ class EfiCard extends \Opencart\System\Engine\Controller
                     false
                 );
             } else {
-                // Busca histórico direto do banco (método custom abaixo)
+                // Busca histórico direto do banco
                 $histories = $this->getOrderHistories($order_id, 0, 100);
 
                 $previous_charge_id = null;
@@ -114,7 +106,7 @@ class EfiCard extends \Opencart\System\Engine\Controller
                 ];
             }
 
-            if ($charge_data['status'] == 'approved') {
+            if ($charge_data['status'] === 'approved') {
                 $this->model_checkout_order->addHistory(
                     $order_id,
                     $settings['payment_efi_order_status_paid'],
@@ -152,7 +144,7 @@ class EfiCard extends \Opencart\System\Engine\Controller
      * @param int $limit
      * @return array
      */
-    private function getOrderHistories($order_id, $start = 0, $limit = 100)
+    private function getOrderHistories($order_id, $start = 0, $limit = 100): array
     {
         $sql = "SELECT * FROM `" . DB_PREFIX . "order_history` WHERE `order_id` = '" . (int)$order_id . "' ORDER BY `date_added` DESC";
         if ($limit) {

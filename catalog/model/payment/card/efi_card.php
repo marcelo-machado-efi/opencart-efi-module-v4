@@ -5,6 +5,7 @@ namespace Opencart\Catalog\Model\Extension\Efi\Payment\Card;
 require_once DIR_EXTENSION . 'efi/library/vendor/autoload.php';
 
 use Opencart\Extension\Efi\Library\EfiConfigHelper;
+use Opencart\Extension\Efi\Helper\EfiShippingHelper;
 use Efi\EfiPay;
 use Exception;
 
@@ -13,15 +14,15 @@ class EfiCard extends \Opencart\System\Engine\Model
     /**
      * Gera uma cobrança via cartão de crédito utilizando a API do EfiPay.
      *
-     * @param array $customer Dados do cliente (nome, documento, email, telefone).
-     * @param array $card Dados do cartão (installments, token).
-     * @param float $amount Valor da cobrança.
-     * @param string $order_id ID do pedido.
-     * @param array $settings Configurações da conta EfiPay.
-     * @param float $shipping Valor do frete (em reais, opcional).
+     * @param array  $customer  Dados do cliente (nome, documento, email, telefone).
+     * @param array  $card      Dados do cartão (installments, token).
+     * @param float  $amount    Valor da cobrança.
+     * @param string $order_id  ID do pedido.
+     * @param array  $settings  Configurações da conta EfiPay.
+     * @param array  $order_info Informações completas do pedido (necessário para frete).
      * @return array Resultado da operação.
      */
-    public function generateCardCharge(array $customer, array $card, float $amount, string $order_id, array $settings, float $shipping = 0.0): array
+    public function generateCardCharge(array $customer, array $card, float $amount, string $order_id, array $settings, array $order_info): array
     {
         try {
             $options = EfiConfigHelper::getEfiConfig($settings);
@@ -38,16 +39,17 @@ class EfiCard extends \Opencart\System\Engine\Model
                 ],
                 'payment' => [
                     'credit_card' => [
-                        'installments' => (int) $card['installments'],
-                        'payment_token' => $card['token'],
-                        'customer' => $customer_data
+                        'installments'   => (int) $card['installments'],
+                        'payment_token'  => $card['token'],
+                        'customer'       => $customer_data
                     ]
                 ]
             ];
 
-            // Adiciona o frete se houver
-            $shippings = $this->getShippings($shipping);
+            // Adiciona o frete usando a helper
+            $shippings = EfiShippingHelper::getShippingsFromOrder($order_info);
             $this->logError('SHIPPING: ' . json_encode($shippings));
+
             if (!empty($shippings)) {
                 $body['shippings'] = $shippings;
             }
@@ -57,55 +59,34 @@ class EfiCard extends \Opencart\System\Engine\Model
             $chargeData = $charge['data'];
 
             if ($chargeData['status'] == 'approved') {
-                $response = [
-                    'success' => true,
+                return [
+                    'success'   => true,
                     'charge_id' => $chargeData['charge_id'] ?? null,
-                    'status' => $chargeData['status'] ?? null,
-                    'message' => 'Pagamento confirmado via cartão de crédito.'
+                    'status'    => $chargeData['status'] ?? null,
+                    'message'   => 'Pagamento confirmado via cartão de crédito.'
                 ];
             } else {
-                $response = [
-                    'success' => true,
+                return [
+                    'success'   => true,
                     'charge_id' => $chargeData['charge_id'] ?? null,
-                    'status' => $chargeData['status'] ?? null,
-                    'message' => 'Não foi possível processar o pagamento. Verifique os dados do cartão e tente novamente.'
+                    'status'    => $chargeData['status'] ?? null,
+                    'message'   => 'Não foi possível processar o pagamento. Verifique os dados do cartão e tente novamente.'
                 ];
             }
-            $this->logError(json_encode($chargeData));
-            return $response;
         } catch (Exception $e) {
             $this->logError("Erro na geração da cobrança via cartão: " . $e->getMessage());
             return [
                 'success' => false,
-                'error' => 'Erro ao gerar cobrança via cartão.'
+                'error'   => 'Erro ao gerar cobrança via cartão.'
             ];
         }
-    }
-
-    /**
-     * Retorna o array de shippings para enviar na API.
-     *
-     * @param float $shipping Valor do frete (em reais)
-     * @return array
-     */
-    public function getShippings(float $shipping): array
-    {
-        if ($shipping > 0) {
-            return [
-                [
-                    'name' => 'frete',
-                    'value' => intval($shipping * 100) // valor em centavos
-                ]
-            ];
-        }
-        return [];
     }
 
     /**
      * Retentativa de pagamento via cartão de crédito usando a API do EfiPay.
      *
      * @param string $charge_id      ID da cobrança original.
-     * @param array  $customer       Dados do cliente (nome, documento, email, telefone) crus.
+     * @param array  $customer       Dados do cliente (nome, documento, email, telefone).
      * @param string $payment_token  Token do cartão a ser tentado.
      * @param array  $settings       Configurações da conta EfiPay.
      * @return array Resultado da operação.
@@ -114,16 +95,15 @@ class EfiCard extends \Opencart\System\Engine\Model
     {
         try {
             $options = EfiConfigHelper::getEfiConfig($settings);
-            $params = [
-                "id" => $charge_id
-            ];
+            $params = ["id" => $charge_id];
+
             $customer_data = $this->getFormattedCustomer($customer);
 
             $body = [
                 'payment' => [
                     'credit_card' => [
-                        'customer' => $customer_data,
-                        'payment_token' => $payment_token
+                        'customer'       => $customer_data,
+                        'payment_token'  => $payment_token
                     ]
                 ]
             ];
@@ -132,26 +112,26 @@ class EfiCard extends \Opencart\System\Engine\Model
             $charge = $efiPay->cardPaymentRetry($params, $body);
             $chargeData = $charge['data'];
 
-            if (isset($chargeData['status']) && $chargeData['status'] == 'approved') {
+            if (isset($chargeData['status']) && $chargeData['status'] === 'approved') {
                 return [
-                    'success' => true,
+                    'success'   => true,
                     'charge_id' => $charge_id,
-                    'status' => $chargeData['status'],
-                    'message' => 'Pagamento confirmado via cartão de crédito.'
+                    'status'    => $chargeData['status'],
+                    'message'   => 'Pagamento confirmado via cartão de crédito.'
                 ];
             } else {
                 return [
-                    'success' => false,
+                    'success'   => false,
                     'charge_id' => $charge_id,
-                    'status' => $chargeData['status'] ?? null,
-                    'message' =>  'Não foi possível processar o pagamento. Verifique os dados do cartão e tente novamente.'
+                    'status'    => $chargeData['status'] ?? null,
+                    'message'   => 'Não foi possível processar o pagamento. Verifique os dados do cartão e tente novamente.'
                 ];
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->logError("Erro na retentativa do cartão: " . $e->getMessage());
             return [
                 'success' => false,
-                'error' => 'Erro na retentativa de pagamento via cartão.'
+                'error'   => 'Erro na retentativa de pagamento via cartão.'
             ];
         }
     }
@@ -187,28 +167,12 @@ class EfiCard extends \Opencart\System\Engine\Model
     /**
      * Registra erros no log do OpenCart.
      *
-     * @param string $message Mensagem de erro.
+     * @param string $message
      * @return void
      */
     private function logError(string $message): void
     {
         $log = new \Opencart\System\Library\Log('efi_card.log');
         $log->write($message);
-    }
-
-    /**
-     * Gera a URL de notificação para ser usada na configuração de cobranca.
-     *
-     * @return string URL de notificação.
-     */
-    public function getNotificationUrl(): string
-    {
-        if (!defined('HTTPS_CATALOG')) {
-            $baseUrl = HTTPS_CATALOG;
-        } else {
-            $baseUrl = HTTP_CATALOG;
-        }
-
-        return rtrim($baseUrl, '/') . '/index.php?route=extension/efi/payment/efi_charge_notification';
     }
 }
