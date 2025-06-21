@@ -47,6 +47,7 @@ class EfiCard extends \Opencart\System\Engine\Model
 
             // Adiciona o frete se houver
             $shippings = $this->getShippings($shipping);
+            $this->logError('SHIPPING: ' . json_encode($shippings));
             if (!empty($shippings)) {
                 $body['shippings'] = $shippings;
             }
