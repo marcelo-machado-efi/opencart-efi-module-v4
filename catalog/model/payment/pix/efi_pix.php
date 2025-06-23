@@ -23,7 +23,7 @@ class EfiPix extends \Opencart\System\Engine\Model
             $amount = $this->applyDiscount($amount, $pix_discount);
 
             // Aplica frete (caso haja)
-            $shippings = EfiShippingHelper::getShippingsFromOrder($order_info, 'charge');
+            $shippings = EfiShippingHelper::getShippingsFromOrder($order_info, 'pix');
             $this->logError('SHIPPING: ' . json_encode($shippings));
             foreach ($shippings as $ship) {
                 if (isset($ship['value'])) {
