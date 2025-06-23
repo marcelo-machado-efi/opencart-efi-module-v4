@@ -8,9 +8,10 @@ class EfiShippingHelper
      * Retorna o array de shipping formatado a partir do $order_info.
      *
      * @param array $order_info Informações do pedido
+     * @param string $type Tipo de chamada (ex: 'charge', 'subscription', etc.)
      * @return array
      */
-    public static function getShippingsFromOrder(array $order_info): array
+    public static function getShippingsFromOrder(array $order_info, string $type = 'charge'): array
     {
         $shipping_value = 0.00;
 
@@ -22,18 +23,23 @@ class EfiShippingHelper
             $shipping_value = (float) $order_info['shipping_method']['cost'];
         }
 
-        return self::formatShippings($shipping_value);
+        return self::formatShippings($shipping_value, $type);
     }
 
     /**
-     * Formata o valor de frete no padrão esperado pela API (centavos).
+     * Formata o valor de frete de acordo com o tipo de uso.
      *
      * @param float $shipping Valor do frete em reais
+     * @param string $type Tipo de chamada
      * @return array
      */
-    public static function formatShippings(float $shipping): array
+    public static function formatShippings(float $shipping, string $type = 'charge'): array
     {
-        if ($shipping > 0) {
+        if ($shipping <= 0) {
+            return [];
+        }
+
+        if ($type === 'charge') {
             return [
                 [
                     'name'  => 'frete',
@@ -42,6 +48,8 @@ class EfiShippingHelper
             ];
         }
 
-        return [];
+        return [
+            'value' => $shipping
+        ];
     }
 }
