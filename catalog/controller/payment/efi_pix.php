@@ -31,7 +31,8 @@ class EfiPix extends \Opencart\System\Engine\Controller
             $amount = (float) $order_info['total'];
             [$pixModel, $settings] = $this->loadPixDependencies();
 
-            $pix_data = $pixModel->generatePix($customer_name, $customer_document, $amount, $order_id, $settings);
+            // Passa o order_info para o model
+            $pix_data = $pixModel->generatePix($customer_name, $customer_document, $amount, $order_id, $settings, $order_info);
 
             if (!$pix_data['success']) {
                 throw new \Exception($pix_data['error']);
@@ -122,7 +123,6 @@ class EfiPix extends \Opencart\System\Engine\Controller
 
             $data['status'] = ($order_status_id_atual == $order_status_id_pago) ? 'CONCLUIDA' : null;
             $data['redirect'] = html_entity_decode($this->url->link('checkout/success', 'language=' . $this->config->get('config_language'), true), ENT_QUOTES, 'UTF-8');
-
 
             $this->response->addHeader('Content-Type: application/json');
             $this->response->setOutput(json_encode($data));

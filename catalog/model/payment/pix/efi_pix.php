@@ -4,35 +4,39 @@ namespace Opencart\Catalog\Model\Extension\Efi\Payment\Pix;
 
 require_once DIR_EXTENSION . 'efi/library/vendor/autoload.php';
 
-
 use Opencart\Extension\Efi\Library\EfiConfigHelper;
+use Opencart\Extension\Efi\Library\EfiShippingHelper;
 use Efi\EfiPay;
 use Exception;
 
 class EfiPix extends \Opencart\System\Engine\Model
 {
-    public function generatePix(string $customer_name, string $customer_document, float $amount, string $order_id, array $settings): array
+    public function generatePix(string $customer_name, string $customer_document, float $amount, string $order_id, array $settings, array $order_info): array
     {
         try {
-            // Configuração da API do EfiPay
             $options = EfiConfigHelper::getEfiConfig($settings);
             $pix_key = $this->config->get('payment_efi_pix_key');
-            $pix_expire_at = (int) $this->config->get('payment_efi_pix_expire_at') * 3600; // Converte para segundos
+            $pix_expire_at = (int) $this->config->get('payment_efi_pix_expire_at') * 3600;
             $pix_discount = $this->config->get('payment_efi_pix_discount');
 
             // Aplica desconto
             $amount = $this->applyDiscount($amount, $pix_discount);
 
-            // Gera `txid` com 35 caracteres
-            $txid = $this->generateTxid($order_id);
+            // Aplica frete (caso haja)
+            $shippings = EfiShippingHelper::getShippingsFromOrder($order_info, 'charge');
+            $this->logError('SHIPPING: ' . json_encode($shippings));
+            foreach ($shippings as $ship) {
+                if (isset($ship['value'])) {
+                    $amount += $ship['value'] / 100;
+                }
+            }
 
-            // Obtém os dados do pagador (CPF ou CNPJ)
+            $txid = $this->generateTxid($order_id);
             $devedor = $this->getDevedor($customer_name, $customer_document);
             if (!$devedor) {
                 throw new Exception('Documento inválido.');
             }
 
-            // Dados da cobrança Pix
             $body = [
                 'calendario' => ['expiracao' => $pix_expire_at],
                 'devedor' => $devedor,
@@ -41,21 +45,15 @@ class EfiPix extends \Opencart\System\Engine\Model
                 'solicitacaoPagador' => "Pagamento do Pedido #{$order_id}"
             ];
 
-            // Inicializa a API do EfiPay
             $efiPay = new EfiPay($options);
             $params = ['txid' => $txid];
-
-            // Cria a cobrança Pix
             $pix_charge = $efiPay->pixCreateCharge($params, $body);
 
             if (!isset($pix_charge['loc']['id'])) {
                 throw new Exception('Erro ao gerar cobrança Pix.');
             }
 
-            // Obtém o QR Code do Pix
             $qrcode = $efiPay->pixGenerateQRCode(['id' => $pix_charge['loc']['id']]);
-
-            // Obtém o tempo de expiração da cobrança (retornado pela API)
             $expiration_time = $pix_charge['calendario']['expiracao'] ?? $pix_expire_at;
 
             return [
@@ -64,7 +62,7 @@ class EfiPix extends \Opencart\System\Engine\Model
                 'qrcode' => $qrcode['qrcode'],
                 'pix_url' => $qrcode['imagemQrcode'],
                 'txid' => $txid,
-                'expiration_time' => $expiration_time // Tempo de expiração em segundos
+                'expiration_time' => $expiration_time
             ];
         } catch (Exception $e) {
             $this->logError("Erro na geração do Pix: " . $e->getMessage());
@@ -75,57 +73,49 @@ class EfiPix extends \Opencart\System\Engine\Model
         }
     }
 
-
     public function getLocQRCode(string $locId, array $settings)
     {
         $options = EfiConfigHelper::getEfiConfig($settings);
         $efiPay = new EfiPay($options);
 
-        $qrcode = $efiPay->pixGenerateQRCode(['id' => $locId]);
-
-        return $qrcode;
+        return $efiPay->pixGenerateQRCode(['id' => $locId]);
     }
+
     public function getDetailPix(string $txid, array $settings)
     {
         $options = EfiConfigHelper::getEfiConfig($settings);
         $efiPay = new EfiPay($options);
 
-        $qrcode = $efiPay->pixDetailCharge(['txid' => $txid]);
-
-        return $qrcode;
+        return $efiPay->pixDetailCharge(['txid' => $txid]);
     }
 
     private function applyDiscount(float $amount, string $discount): float
     {
         $discount = trim($discount);
-
         if (strpos($discount, '%') !== false) {
-            $discountPercent = (float) str_replace('%', '', $discount);
-            $discountValue = ($amount * ($discountPercent / 100));
+            $percent = (float) str_replace('%', '', $discount);
+            $value = ($amount * $percent / 100);
         } else {
-            $discountValue = (float) $discount;
+            $value = (float) $discount;
         }
 
-        return max(0, $amount - $discountValue);
+        return max(0, $amount - $value);
     }
 
     private function generateTxid(string $order_id): string
     {
-        $order_id_length = strlen($order_id);
-        $zero_fill = str_repeat('0', max(0, 33 - $order_id_length));
+        $zero_fill = str_repeat('0', max(0, 33 - strlen($order_id)));
         return "OC" . substr($zero_fill . $order_id, -33);
     }
 
-    private function getDevedor(string $customer_name, string $customer_document): ?array
+    private function getDevedor(string $name, string $document): ?array
     {
-        $document = preg_replace('/\D/', '', $customer_document);
-
-        if (strlen($document) === 11) {
-            return ['nome' => $customer_name, 'cpf' => $document];
-        } elseif (strlen($document) === 14) {
-            return ['nome' => $customer_name, 'cnpj' => $document];
+        $doc = preg_replace('/\D/', '', $document);
+        if (strlen($doc) === 11) {
+            return ['nome' => $name, 'cpf' => $doc];
+        } elseif (strlen($doc) === 14) {
+            return ['nome' => $name, 'cnpj' => $doc];
         }
-
         return null;
     }
 
