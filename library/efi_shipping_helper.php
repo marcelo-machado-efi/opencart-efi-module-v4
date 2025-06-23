@@ -23,6 +23,8 @@ class EfiShippingHelper
             $shipping_value = (float) $order_info['shipping_method']['cost'];
         }
 
+        self::logShippingInfo($shipping_value, $type);
+
         return self::formatShippings($shipping_value, $type);
     }
 
@@ -51,5 +53,18 @@ class EfiShippingHelper
         return [
             'value' => $shipping
         ];
+    }
+
+    /**
+     * Salva log com os dados de frete e tipo.
+     *
+     * @param float $shipping
+     * @param string $type
+     * @return void
+     */
+    private static function logShippingInfo(float $shipping, string $type): void
+    {
+        $log = new \Opencart\System\Library\Log('efi_shippings.log');
+        $log->write("Tipo: {$type} | Valor do frete: {$shipping}");
     }
 }
