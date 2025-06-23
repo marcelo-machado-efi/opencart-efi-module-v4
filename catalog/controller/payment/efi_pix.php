@@ -31,6 +31,7 @@ class EfiPix extends \Opencart\System\Engine\Controller
             $amount = $this->cart->getTotal();
             [$pixModel, $settings] = $this->loadPixDependencies();
 
+
             // Passa o order_info para o model
             $pix_data = $pixModel->generatePix($customer_name, $customer_document, $amount, $order_id, $settings, $order_info);
 
