@@ -25,7 +25,7 @@ class EfiBillet extends \Opencart\System\Engine\Controller
                 throw new \Exception('Pedido não encontrado.');
             }
 
-            $amount = (float) $order_info['total'];
+            $amount = $this->cart->getTotal();
 
             $this->load->model('setting/setting');
             $settings = $this->model_setting_setting->getSetting('payment_efi');

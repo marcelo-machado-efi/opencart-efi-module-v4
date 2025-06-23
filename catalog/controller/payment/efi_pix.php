@@ -28,7 +28,7 @@ class EfiPix extends \Opencart\System\Engine\Controller
                 throw new \Exception('Pedido não encontrado.');
             }
 
-            $amount = (float) $order_info['total'];
+            $amount = $this->cart->getTotal();
             [$pixModel, $settings] = $this->loadPixDependencies();
 
             // Passa o order_info para o model
