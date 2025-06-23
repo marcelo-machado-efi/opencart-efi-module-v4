@@ -30,11 +30,10 @@ class EfiPix extends \Opencart\System\Engine\Model
             $shippings = EfiShippingHelper::getShippingsFromOrder($order_info, 'pix');
             $this->logError('SHIPPING: ' . json_encode($shippings));
 
-            foreach ($shippings as $ship) {
-                if (isset($ship['value'])) {
-                    $amount += $ship['value'];
-                }
+            if (isset($shippings['value'])) {
+                $amount += $shippings['value'];
             }
+
 
             $this->logError("VALOR FINAL (COM FRETE): {$amount}");
 
