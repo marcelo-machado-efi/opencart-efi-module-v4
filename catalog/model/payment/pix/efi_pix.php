@@ -19,17 +19,24 @@ class EfiPix extends \Opencart\System\Engine\Model
             $pix_expire_at = (int) $this->config->get('payment_efi_pix_expire_at') * 3600;
             $pix_discount = $this->config->get('payment_efi_pix_discount');
 
+            // Log do valor original
+            $this->logError("VALOR ORIGINAL: {$amount}");
+
             // Aplica desconto
             $amount = $this->applyDiscount($amount, $pix_discount);
+            $this->logError("VALOR COM DESCONTO: {$amount}");
 
             // Aplica frete (caso haja)
             $shippings = EfiShippingHelper::getShippingsFromOrder($order_info, 'pix');
             $this->logError('SHIPPING: ' . json_encode($shippings));
+
             foreach ($shippings as $ship) {
                 if (isset($ship['value'])) {
                     $amount += $ship['value'];
                 }
             }
+
+            $this->logError("VALOR FINAL (COM FRETE): {$amount}");
 
             $txid = $this->generateTxid($order_id);
             $devedor = $this->getDevedor($customer_name, $customer_document);
