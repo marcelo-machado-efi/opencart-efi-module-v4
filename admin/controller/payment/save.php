@@ -6,7 +6,7 @@ use Opencart\System\Library\Log;
 
 class Save extends \Opencart\System\Engine\Controller
 {
-    public function index(): void
+    public function saveConfig(): void
     {
         $log = new Log('efi.log');
 
@@ -24,9 +24,7 @@ class Save extends \Opencart\System\Engine\Controller
 
             $webhookErrors = $this->registerWebhooks($this->request->post);
             if (!empty($webhookErrors)) {
-                $this->sendJson([
-                    'error' => implode(' | ', $webhookErrors)
-                ]);
+                $this->sendJson(['error' => implode(' | ', $webhookErrors)]);
                 return;
             }
 
@@ -39,9 +37,7 @@ class Save extends \Opencart\System\Engine\Controller
             $this->sendJson(['success' => $this->language->get('text_success')]);
         } catch (\Throwable $e) {
             $log->write('Save.php exception: ' . $e->getMessage());
-            $this->sendJson([
-                'error' => 'Ocorreu um erro inesperado. Veja o log para mais detalhes.'
-            ]);
+            $this->sendJson(['error' => 'Ocorreu um erro inesperado. Veja o log para mais detalhes.']);
         }
     }
 

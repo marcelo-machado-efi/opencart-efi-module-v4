@@ -6,17 +6,13 @@ use Opencart\System\Library\Log;
 
 class Upload extends \Opencart\System\Engine\Controller
 {
-    /**
-     * Processa o upload do certificado .p12
-     */
-    public function index(): void
+    public function uploadCertificate(): void
     {
         $this->response->addHeader('Content-Type: application/json');
         $result = ['success' => null, 'error' => null];
         $log = new Log('efi.log');
 
         try {
-            // Pega o primeiro arquivo enviado
             $file = reset($_FILES);
 
             if (!isset($file) || $file['error'] !== UPLOAD_ERR_OK) {
@@ -25,7 +21,6 @@ class Upload extends \Opencart\System\Engine\Controller
                 return;
             }
 
-            // Valida tipo
             $allowed = ['application/x-pkcs12'];
             if (!in_array($file['type'], $allowed)) {
                 $result['error'] = 'O arquivo enviado não é um certificado .p12 válido.';
@@ -33,7 +28,6 @@ class Upload extends \Opencart\System\Engine\Controller
                 return;
             }
 
-            // Prepara diretório
             $uploadDir = DIR_STORAGE . 'efi_certificates/';
             if (!is_dir($uploadDir) && !mkdir($uploadDir, 0755, true)) {
                 throw new \RuntimeException('Falha ao criar diretório de upload.');
