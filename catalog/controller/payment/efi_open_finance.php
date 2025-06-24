@@ -9,11 +9,10 @@ class EfiOpenFinance extends \Opencart\System\Engine\Controller
         try {
             $this->validarRequisicaoPost();
 
-            $customer_document_cpf = $this->request->post['payment_efi_open_finance_customer_cpf'] ?? '';
+            $customer_document_cpf  = $this->request->post['payment_efi_open_finance_customer_cpf'] ?? '';
             $customer_document_cnpj = $this->request->post['payment_efi_open_finance_customer_cnpj'] ?? '';
-            $customer_bank = $this->request->post['payment_efi_open_finance_customer_bank'] ?? '';
-
-            $order_id = $this->session->data['order_id'] ?? 0;
+            $customer_bank          = $this->request->post['payment_efi_open_finance_customer_bank'] ?? '';
+            $order_id               = $this->session->data['order_id'] ?? 0;
 
             $this->logEfi("Processando pedido ID: $order_id");
 
@@ -24,17 +23,26 @@ class EfiOpenFinance extends \Opencart\System\Engine\Controller
                 throw new \Exception('Pedido não encontrado.');
             }
 
-            $amount = (float) $order_info['total'];
+            $amount = $this->cart->getTotal();
             [$openFinanceModel, $settings] = $this->loadOpenFinanceDependencies();
 
-            $openFinanceData = $openFinanceModel->generatePayment($customer_document_cpf, $customer_document_cnpj, $customer_bank, $amount, $order_id, $settings);
+            // Agora enviando também o $order_info
+            $openFinanceData = $openFinanceModel->generatePayment(
+                $customer_document_cpf,
+                $customer_document_cnpj,
+                $customer_bank,
+                $amount,
+                $order_id,
+                $settings,
+                $order_info
+            );
 
             if (!$openFinanceData['success']) {
                 throw new \Exception($openFinanceData['error']);
             }
 
             $order_status_id = 2;
-            $redirectUrl = $openFinanceData['redirect_url'];
+            $redirectUrl     = $openFinanceData['redirect_url'];
 
             $comment = 'Pagamento via Open Finance iniciado:<br><a href="' . $redirectUrl . '" class="btn btn-sm btn-primary mt-2" target="_blank">Autorizar no banco</a>';
             $this->model_checkout_order->addHistory($order_id, $order_status_id, $comment, true);
@@ -43,22 +51,24 @@ class EfiOpenFinance extends \Opencart\System\Engine\Controller
             unset($this->session->data['order_id']);
 
             $data = [
-                'success' => true,
-                'message' => 'Redirecionando para banco...',
+                'success'  => true,
+                'message'  => 'Redirecionando para banco...',
                 'redirect' => $redirectUrl
             ];
 
             $this->response->addHeader('Content-Type: application/json');
-
             $this->response->setOutput(json_encode($data));
         } catch (\Exception $e) {
             $this->logEfi("Erro no processamento Open Finance: " . $e->getMessage());
-            $data['error'] = $e->getMessage();
+
+            $data['error']  = $e->getMessage();
             $data['header'] = $this->load->controller('common/header');
             $data['footer'] = $this->load->controller('common/footer');
 
             $this->response->addHeader('Content-Type: text/html; charset=UTF-8');
-            $this->response->setOutput($this->load->view('extension/efi/payment/efi_error_ajax', $data));
+            $this->response->setOutput(
+                $this->load->view('extension/efi/payment/efi_error_ajax', $data)
+            );
         }
     }
 
@@ -74,13 +84,14 @@ class EfiOpenFinance extends \Opencart\System\Engine\Controller
             [$openFinanceModel, $settings] = $this->loadOpenFinanceDependencies();
             $detail = $openFinanceModel->getDetailPayment($identificadorPagamento, $settings);
 
-            $data['status'] = $detail['status'];
+            $data['status']   = $detail['status'];
             $data['redirect'] = $this->url->link('checkout/success', 'language=' . $this->config->get('config_language'));
 
             $this->response->addHeader('Content-Type: application/json');
             $this->response->setOutput(json_encode($data));
         } catch (\Exception $e) {
             $this->logEfi("Erro na verificação Open Finance: " . $e->getMessage());
+
             $this->response->clearHeaders();
             $this->response->addHeader('Content-Type: application/json');
             $this->response->setOutput(json_encode(['status' => 'erro', 'mensagem' => $e->getMessage()]));

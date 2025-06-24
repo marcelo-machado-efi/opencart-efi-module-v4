@@ -5,6 +5,7 @@ namespace Opencart\Catalog\Model\Extension\Efi\Payment\OpenFinance;
 require_once DIR_EXTENSION . 'efi/library/vendor/autoload.php';
 
 use Opencart\Extension\Efi\Library\EfiConfigHelper;
+use Opencart\Extension\Efi\Library\EfiShippingHelper;
 use Efi\EfiPay;
 use Exception;
 
@@ -19,7 +20,8 @@ class EfiOpenFinance extends \Opencart\System\Engine\Model
         string $customer_bank,
         float $amount,
         string $order_id,
-        array $settings
+        array $settings,
+        array $order_info
     ): array {
         try {
             // Configurações Efí
@@ -59,6 +61,16 @@ class EfiOpenFinance extends \Opencart\System\Engine\Model
             // Desconto, se houver
             $discount = $settings['payment_efi_open_finance_discount'] ?? '';
             $valorFinal = $this->aplicarDesconto($amount, $discount);
+
+            // Aplica o frete (se houver)
+            $shippings = EfiShippingHelper::getShippingsFromOrder($order_info, 'pix');
+            $this->logError('SHIPPING: ' . json_encode($shippings));
+
+            if (isset($shippings['value'])) {
+                $valorFinal += (float) $shippings['value'];
+            }
+
+            $this->logError("VALOR FINAL COM FRETE: {$valorFinal}");
 
             // Corpo da requisição
             $body = [
@@ -142,7 +154,6 @@ class EfiOpenFinance extends \Opencart\System\Engine\Model
             }
         }
 
-        // Se o desconto for inválido, ignora e retorna o valor original
         return $valorOriginal;
     }
 
