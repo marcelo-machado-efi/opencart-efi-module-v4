@@ -14,6 +14,7 @@ class Efi extends \Opencart\System\Engine\Controller
 			// Recursos comuns
 			$this->document->addStyle('extension/efi/catalog/view/stylesheet/fontawesome/css/all.min.css');
 			$this->document->addStyle('extension/efi/catalog/view/stylesheet/common/color-brand.css');
+			$this->document->addStyle('https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css');
 			$this->document->addScript('extension/efi/catalog/view/javascript/validation/commonValidations.js');
 			$this->document->addScript('extension/efi/catalog/view/javascript/libs/imask.min.js');
 			$this->document->addScript('extension/efi/catalog/view/javascript/common/masks.js');
