@@ -23,7 +23,6 @@
 			<div class="col-12">
 				<div class="alert alert-warning py-2 px-3 d-flex align-items-center justify-content-center gap-2 small mb-3" role="alert">
 					<i class="bi bi-exclamation-triangle-fill"></i>
-
 					<span>O desconto não se aplica ao valor do frete.</span>
 				</div>
 
@@ -61,9 +60,15 @@
 						{% endfor %}
 					</select>
 				{% else %}
-					<input type="{{ input.type }}" name="{{ input.name }}" id="{{ input.name }}" class="form-control"
+					<input
+						type="{{ input.type }}"
+						name="{{ input.name }}"
+						id="{{ input.name }}"
+						class="form-control"
 						{% if input.required %}required{% endif %}
-						{% if input['data-mask'] %}data-mask="{{ input['data-mask'] }}"{% endif %}>
+						{% if input['data-mask'] %}data-mask="{{ input['data-mask'] }}"{% endif %}
+						{% if input.value %}value="{{ input.value }}"{% endif %}
+					>
 				{% endif %}
 			</div>
 		{% endfor %}
