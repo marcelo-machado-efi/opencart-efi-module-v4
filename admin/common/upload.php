@@ -1,12 +1,12 @@
 <?php
 
-namespace Opencart\Admin\Controller\Extension\Efi\Payment;
+namespace Opencart\Admin\Controller\Extension\Efi\Common;
 
 use Opencart\System\Library\Log;
 
 class Upload extends \Opencart\System\Engine\Controller
 {
-    public function uploadCertificate(): void
+    public function index(): void
     {
         $this->response->addHeader('Content-Type: application/json');
         $result = ['success' => null, 'error' => null];

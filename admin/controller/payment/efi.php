@@ -10,8 +10,8 @@ class Efi extends \Opencart\System\Engine\Controller
 		$group_id = $this->user->getGroupId();
 
 		$routes = [
-			'extension/efi/payment/upload.uploadCertificate',
-			'extension/efi/payment/save.saveConfig',
+			'extension/efi/common/upload',
+			'extension/efi/common/save',
 		];
 
 		foreach ($routes as $route) {
@@ -26,8 +26,8 @@ class Efi extends \Opencart\System\Engine\Controller
 		$group_id = $this->user->getGroupId();
 
 		$routes = [
-			'extension/efi/payment/upload.uploadCertificate',
-			'extension/efi/payment/save.saveConfig',
+			'extension/efi/common/upload',
+			'extension/efi/common/save',
 		];
 
 		foreach ($routes as $route) {
@@ -59,8 +59,8 @@ class Efi extends \Opencart\System\Engine\Controller
 		];
 
 		$data['options']                     = $this->model_extension_efi_payment_efi_config->getConfig($this->language);
-		$data['save']                        = $this->url->link('extension/efi/payment/save.saveConfig', 'user_token=' . $this->session->data['user_token']);
-		$data['upload']                      = $this->url->link('extension/efi/payment/upload.uploadCertificate', 'user_token=' . $this->session->data['user_token']);
+		$data['save']                        = $this->url->link('extension/efi/common/save', 'user_token=' . $this->session->data['user_token']);
+		$data['upload']                      = $this->url->link('extension/efi/common/upload', 'user_token=' . $this->session->data['user_token']);
 		$data['back']                        = $this->url->link('marketplace/extension', 'user_token=' . $this->session->data['user_token'] . '&type=payment');
 		$data['payment_efi_order_status_id'] = $this->config->get('payment_efi_order_status_id');
 

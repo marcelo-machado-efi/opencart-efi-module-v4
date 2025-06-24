@@ -1,12 +1,12 @@
 <?php
 
-namespace Opencart\Admin\Controller\Extension\Efi\Payment;
+namespace Opencart\Admin\Controller\Extension\Efi\Common;
 
 use Opencart\System\Library\Log;
 
 class Save extends \Opencart\System\Engine\Controller
 {
-    public function saveConfig(): void
+    public function index(): void
     {
         $log = new Log('efi.log');
 
