@@ -22,6 +22,8 @@ class EfiCancelListener extends \Opencart\System\Engine\Controller
      */
     public function onOrderStatusUpdate(string &$route, array &$args, mixed &$output): void
     {
+        $this->log("EVENT TRIGGERED: onOrderStatusUpdate route={$route} args=" . json_encode($args));
+
         $order_id = (int) ($args[0] ?? 0);
         $new_status_id = (int) ($args[1] ?? 0);
         $cancel_status_id = 7; // Ajuste conforme o ID de status de cancelamento da sua loja
