@@ -2,14 +2,8 @@
 
 namespace Opencart\Admin\Controller\Extension\Efi\Payment;
 
-/**
- * Controller de instalação e administração do módulo Efí.
- */
 class Efi extends \Opencart\System\Engine\Controller
 {
-	/**
-	 * Instala o módulo e configura permissões e eventos.
-	 */
 	public function install(): void
 	{
 		$this->load->model('user/user_group');
@@ -25,18 +19,18 @@ class Efi extends \Opencart\System\Engine\Controller
 			$this->model_user_user_group->addPermission($group_id, 'modify', $route);
 		}
 
-		// Registra o listener do evento de alteração de status do pedido
+		// Registra o evento de cancelamento de pedido
 		$this->load->model('setting/event');
-		$this->model_setting_event->addEvent(
-			'efi_cancel_listener',
-			'catalog/model/checkout/order/editOrderHistory/after',
-			'extension/efi/event/efi_cancel_listener.onOrderStatusUpdate'
-		);
+		$this->model_setting_event->addEvent([
+			'code'        => 'efi_cancel_order',
+			'description' => 'Cancela cobrança Efí ao cancelar pedido',
+			'trigger'     => 'admin/model/sale/order/editOrderStatus/after',
+			'action'      => 'extension/efi/event/efi_cancel_listener::onOrderStatusUpdate',
+			'status'      => 1,
+			'sort_order'  => 0
+		]);
 	}
 
-	/**
-	 * Remove permissões e eventos ao desinstalar o módulo.
-	 */
 	public function uninstall(): void
 	{
 		$this->load->model('user/user_group');
@@ -52,18 +46,16 @@ class Efi extends \Opencart\System\Engine\Controller
 			$this->model_user_user_group->removePermission($group_id, 'modify', $route);
 		}
 
-		// Remove o evento registrado
+		// Remove o evento cadastrado
 		$this->load->model('setting/event');
-		$this->model_setting_event->deleteEventByCode('efi_cancel_listener');
+		$this->model_setting_event->deleteEventByCode('efi_cancel_order');
 	}
 
-	/**
-	 * Tela de configuração do módulo no admin.
-	 */
 	public function index(): void
 	{
 		$this->load->language('extension/efi/payment/efi');
 		$this->load->model('extension/efi/payment/efi_config');
+
 		$this->install();
 
 		$this->document->setTitle($this->language->get('heading_title'));
@@ -83,16 +75,16 @@ class Efi extends \Opencart\System\Engine\Controller
 			]
 		];
 
-		$data['options']                      = $this->model_extension_efi_payment_efi_config->getConfig($this->language);
-		$data['save']                         = $this->url->link('extension/efi/common/save', 'user_token=' . $this->session->data['user_token']);
-		$data['upload']                       = $this->url->link('extension/efi/common/upload', 'user_token=' . $this->session->data['user_token']);
-		$data['back']                         = $this->url->link('marketplace/extension', 'user_token=' . $this->session->data['user_token'] . '&type=payment');
-		$data['payment_efi_order_status_id']  = $this->config->get('payment_efi_order_status_id');
-		$data['payment_efi_status']           = $this->config->get('payment_efi_status');
-		$data['payment_efi_sort_order']       = $this->config->get('payment_efi_sort_order');
+		$data['options']                     = $this->model_extension_efi_payment_efi_config->getConfig($this->language);
+		$data['save']                        = $this->url->link('extension/efi/common/save', 'user_token=' . $this->session->data['user_token']);
+		$data['upload']                      = $this->url->link('extension/efi/common/upload', 'user_token=' . $this->session->data['user_token']);
+		$data['back']                        = $this->url->link('marketplace/extension', 'user_token=' . $this->session->data['user_token'] . '&type=payment');
+		$data['payment_efi_order_status_id'] = $this->config->get('payment_efi_order_status_id');
 
 		$this->load->model('localisation/order_status');
-		$data['order_statuses'] = $this->model_localisation_order_status->getOrderStatuses();
+		$data['order_statuses']        = $this->model_localisation_order_status->getOrderStatuses();
+		$data['payment_efi_status']    = $this->config->get('payment_efi_status');
+		$data['payment_efi_sort_order'] = $this->config->get('payment_efi_sort_order');
 
 		$data['header']      = $this->load->controller('common/header');
 		$data['column_left'] = $this->load->controller('common/column_left');
