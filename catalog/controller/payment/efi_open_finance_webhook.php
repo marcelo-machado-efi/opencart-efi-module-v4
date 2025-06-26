@@ -62,8 +62,8 @@ class EfiOpenFinanceWebhook extends \Opencart\System\Engine\Controller
             $this->log->write('Webhook recebido: ' . json_encode($webhookData));
 
             if (!$webhookData || !isset($webhookData['tipo']) || $webhookData['tipo'] !== 'pagamento') {
-                $this->response->addHeader($this->request->server['SERVER_PROTOCOL'] . ' 400 Bad Request');
-                $this->response->setOutput('Webhook inválido');
+                $this->response->addHeader($this->request->server['SERVER_PROTOCOL'] . ' 200 Bad Request');
+                $this->response->setOutput('Webhook configurado com sucesso');
                 return;
             }
 
