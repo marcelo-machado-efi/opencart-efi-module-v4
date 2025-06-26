@@ -32,6 +32,7 @@ class Efi extends \Opencart\System\Engine\Controller
 		]);
 	}
 
+
 	public function uninstall(): void
 	{
 		$this->load->model('user/user_group');
