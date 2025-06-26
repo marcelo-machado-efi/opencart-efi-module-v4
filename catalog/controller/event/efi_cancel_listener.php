@@ -23,19 +23,18 @@ class EfiCancelListener extends \Opencart\System\Engine\Controller
 
         $this->load->model('setting/setting');
         $settings = $this->model_setting_setting->getSetting('payment_efi');
-        $this->log("Configurações carregadas: " . json_encode($settings));
 
         $this->load->model('checkout/order');
         $order_info = $this->model_checkout_order->getOrder($order_id);
-        $this->log("Dados do pedido #{$order_id}: " . json_encode($order_info));
 
         if (!$order_info) {
             $this->log("Pedido #{$order_id} não encontrado.");
             return;
         }
 
-        if ($order_info['payment_code'] !== 'efi_billet') {
-            $this->log("Pedido #{$order_id} não foi pago com efi_billet ({$order_info['payment_code']}).");
+        $payment_code = $order_info['payment_method']['code'] ?? '';
+        if ($payment_code !== 'efi.efi_billet') {
+            $this->log("Pedido #{$order_id} não foi pago com efi.efi_billet ({$payment_code}).");
             return;
         }
 
