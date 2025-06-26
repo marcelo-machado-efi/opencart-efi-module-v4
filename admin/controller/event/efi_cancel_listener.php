@@ -2,7 +2,6 @@
 
 namespace Opencart\Admin\Controller\Extension\Efi\Event;
 
-
 use Efi\EfiPay;
 use Opencart\Extension\Efi\Library\EfiConfigHelper;
 use Opencart\System\Library\Log;
@@ -22,13 +21,14 @@ class EfiCancelListener extends \Opencart\System\Engine\Controller
      */
     public function onOrderStatusUpdate(string &$route, array &$args, mixed &$output): void
     {
-        $this->log("EVENT TRIGGERED: onOrderStatusUpdate route={$route} args=" . json_encode($args));
-
         $order_id = (int) ($args[0] ?? 0);
         $new_status_id = (int) ($args[1] ?? 0);
         $cancel_status_id = 7; // Ajuste conforme o ID de status de cancelamento da sua loja
 
+        $this->log("Evento acionado. order_id: {$order_id}, new_status_id: {$new_status_id}, cancel_status_id esperado: {$cancel_status_id}");
+
         if ($new_status_id !== $cancel_status_id) {
+            $this->log("Status diferente de cancelamento. Ignorando.");
             return;
         }
 
@@ -38,7 +38,15 @@ class EfiCancelListener extends \Opencart\System\Engine\Controller
         $this->load->model('checkout/order');
         $order_info = $this->model_checkout_order->getOrder($order_id);
 
-        if (!$order_info || $order_info['payment_code'] !== 'efi_billet') {
+        if (!$order_info) {
+            $this->log("Pedido não encontrado para o ID: {$order_id}");
+            return;
+        }
+
+        $this->log("Payment code do pedido #{$order_id}: {$order_info['payment_code']}");
+
+        if ($order_info['payment_code'] !== 'efi_billet') {
+            $this->log("Pagamento não é 'efi_billet'. Ignorando.");
             return;
         }
 
@@ -56,13 +64,6 @@ class EfiCancelListener extends \Opencart\System\Engine\Controller
         }
     }
 
-    /**
-     * Consulta o charge_id na API da Efí com base no order_id.
-     *
-     * @param int $order_id ID do pedido
-     * @param array $settings Configurações do módulo Efí
-     * @return int|null
-     */
     private function getChargeIdFromEfi(int $order_id, array $settings): ?int
     {
         $efiPay = new EfiPay(EfiConfigHelper::getEfiConfig($settings));
@@ -91,14 +92,6 @@ class EfiCancelListener extends \Opencart\System\Engine\Controller
         }
     }
 
-    /**
-     * Envia requisição para cancelar uma cobrança Efí.
-     *
-     * @param int $charge_id ID da cobrança
-     * @param array $settings Configurações do módulo Efí
-     * @return void
-     * @throws \Exception Se o cancelamento falhar
-     */
     private function cancelarCobrancaEfi(int $charge_id, array $settings): void
     {
         $efiPay = new EfiPay(EfiConfigHelper::getEfiConfig($settings));
@@ -106,12 +99,6 @@ class EfiCancelListener extends \Opencart\System\Engine\Controller
         $this->log("Cobrança cancelada com sucesso (charge_id: {$charge_id})");
     }
 
-    /**
-     * Registra uma mensagem no log efi_cancel.log.
-     *
-     * @param string $message
-     * @return void
-     */
     private function log(string $message): void
     {
         $log = new Log('efi_cancel.log');
