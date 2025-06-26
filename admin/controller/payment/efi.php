@@ -28,7 +28,7 @@ class Efi extends \Opencart\System\Engine\Controller
 			'code'        => 'efi_cancel_order',
 			'description' => 'Cancela cobrança Efí ao cancelar pedido',
 			'trigger'     => 'admin/model/sale/order/editOrderStatus/after',
-			'action'      => 'extension/efi/event/efi_cancel_listener::onOrderStatusUpdate',
+			'action'      => 'extension/efi/event/efi_cancel_listener.onOrderStatusUpdate',
 			'status'      => 1,
 			'sort_order'  => 1
 		]);
