@@ -77,8 +77,8 @@ class EfiCancelListener extends \Opencart\System\Engine\Controller
             $response = $efiPay->listCharges($params);
             $this->log("Resposta da Efí: " . json_encode($response));
 
-            if (!empty($response['data'][0]['charge_id'])) {
-                return (int) $response['data'][0]['charge_id'];
+            if (!empty($response['data'][0]['id'])) {
+                return (int) $response['data'][0]['id'];
             }
 
             return null;
