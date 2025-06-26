@@ -2,6 +2,9 @@
 
 namespace Opencart\Catalog\Controller\Extension\Efi\Event;
 
+require_once DIR_EXTENSION . 'efi/library/vendor/autoload.php';
+
+
 use Efi\EfiPay;
 use Opencart\Extension\Efi\Library\EfiConfigHelper;
 use Opencart\System\Library\Log;
