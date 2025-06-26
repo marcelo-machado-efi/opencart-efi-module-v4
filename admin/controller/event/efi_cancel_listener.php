@@ -25,7 +25,7 @@ class EfiCancelListener extends \Opencart\System\Engine\Controller
         $new_status_id = (int) ($args[1] ?? 0);
         $cancel_status_id = 7; // Ajuste conforme o ID de status de cancelamento da sua loja
 
-        $this->log("Evento acionado. order_id: {$order_id}, new_status_id: {$new_status_id}, cancel_status_id esperado: {$cancel_status_id}");
+        $this->log("Evento acionado. dados repassados: " . json_encode($args));
 
         if ($new_status_id !== $cancel_status_id) {
             $this->log("Status diferente de cancelamento. Ignorando.");
