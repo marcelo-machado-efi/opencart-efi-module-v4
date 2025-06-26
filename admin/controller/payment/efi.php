@@ -18,6 +18,9 @@ class Efi extends \Opencart\System\Engine\Controller
 			$this->model_user_user_group->addPermission($group_id, 'access', $route);
 			$this->model_user_user_group->addPermission($group_id, 'modify', $route);
 		}
+		// Remove o evento cadastrado
+		$this->load->model('setting/event');
+		$this->model_setting_event->deleteEventByCode('efi_cancel_order');
 
 		// Registra o evento de cancelamento de pedido
 		$this->load->model('setting/event');
@@ -27,7 +30,7 @@ class Efi extends \Opencart\System\Engine\Controller
 			'trigger'     => 'admin/model/sale/order/editOrderStatus/after',
 			'action'      => 'extension/efi/event/efi_cancel_listener::onOrderStatusUpdate',
 			'status'      => 1,
-			'sort_order'  => 0
+			'sort_order'  => 1
 		]);
 	}
 
