@@ -1,9 +1,9 @@
 # Plugin de Pagamento Efí para OpenCart 4
 
-Este plugin oficial da **Efí (antiga Gerencianet)** permite oferecer múltiplas formas de pagamento em sua loja OpenCart 4.1.0.1 utilizando PHP 8.1: **Pix**, **Boleto Bancário**, **Cartão de Crédito** e **Open Finance**.
+Este plugin oficial do **Efí**, banco digital, permite oferecer múltiplas formas de pagamento em sua loja OpenCart 4.1.0.1 utilizando PHP 8.1: **Pix**, **Boleto Bancário**, **Cartão de Crédito** e **Open Finance**.
 
 > ℹ️ Todos os campos obrigatórios devem ser preenchidos corretamente para que o plugin funcione.  
-> 📘 Veja como obter suas credenciais e certificados na [documentação oficial da Efí](https://dev.efipay.com.br/docs).
+> 📘 Veja como obter suas credenciais e certificados na [documentação oficial do Efí](https://dev.efipay.com.br/docs).
 
 ---
 
@@ -27,10 +27,10 @@ Este plugin oficial da **Efí (antiga Gerencianet)** permite oferecer múltiplas
 | Campo                              | Descrição |
 |------------------------------------|-----------|
 | **Client_Id Produção**             | [🔗 Saiba como obter](https://dev.efipay.com.br/docs/api-cobrancas/credenciais#criar-uma-aplica%C3%A7%C3%A3o-ou-configurar-uma-j%C3%A1-existente) |
-| **Client_Secret Produção**         | Mesmo link acima. |
-| **Client_Id Desenvolvimento**      | Mesmo link acima. |
-| **Client_Secret Desenvolvimento**  | Mesmo link acima. |
-| **Identificador da conta**         | Código único da conta na Efí. |
+| **Client_Secret Produção**         | [🔗 Saiba como obter](https://dev.efipay.com.br/docs/api-cobrancas/credenciais#criar-uma-aplica%C3%A7%C3%A3o-ou-configurar-uma-j%C3%A1-existente) |
+| **Client_Id Desenvolvimento**      | [🔗 Saiba como obter](https://dev.efipay.com.br/docs/api-cobrancas/credenciais#criar-uma-aplica%C3%A7%C3%A3o-ou-configurar-uma-j%C3%A1-existente) |
+| **Client_Secret Desenvolvimento**  | [🔗 Saiba como obter](https://dev.efipay.com.br/docs/api-cobrancas/credenciais#criar-uma-aplica%C3%A7%C3%A3o-ou-configurar-uma-j%C3%A1-existente) |
+| **Identificador da conta**         | Código único da conta no Efí. |
 | **Ordem de Exibição**              | Ordem em que a forma de pagamento será listada no checkout. |
 | **Status do pedido ao finalizar o pagamento** | Define o status que será atribuído ao pedido após pagamento. |
 | **Ativar ambiente de teste**       | Habilita o modo sandbox para testes. |
@@ -44,9 +44,9 @@ Este plugin oficial da **Efí (antiga Gerencianet)** permite oferecer múltiplas
 
 | Campo                    | Descrição |
 |--------------------------|-----------|
-| **Chave Pix**            | Chave cadastrada no aplicativo da Efí. |
+| **Chave Pix**            | Chave cadastrada no aplicativo do Efí. |
 | **Tempo de expiração da cobrança** | Tempo em horas que a cobrança ficará disponível. |
-| **Certificado**          | Arquivo `.pfx` gerado via painel Efí. [Ver instruções](https://dev.efipay.com.br/docs/api-pix/credenciais#gerando-um-certificado-p12) |
+| **Certificado**          | Arquivo `.pfx` gerado via painel do Efí. [Ver instruções](https://dev.efipay.com.br/docs/api-pix/credenciais#gerando-um-certificado-p12) |
 | **Desconto**             | Valor fixo ou percentual. `10` = R$10, `5%` = percentual. |
 | **Validar mTLS**         | Veja [aqui](https://dev.efipay.com.br/docs/api-pix/webhooks#entendendo-o-padr%C3%A3o-mtls) se sua conta exige esse padrão. |
 | **Ativar**               | Ativa o pagamento por Pix. |
@@ -85,7 +85,7 @@ Este plugin oficial da **Efí (antiga Gerencianet)** permite oferecer múltiplas
 
 | Campo                             | Descrição |
 |-----------------------------------|-----------|
-| **Chave Pix para recebimento**    | Chave que receberá os pagamentos Open Finance. |
+| **Chave Pix para recebimento**    | Chave que receberá os pagamentos via Open Finance. |
 | **Desconto**                      | Valor fixo ou percentual. |
 | **Certificado**                   | Certificado digital `.pfx`. |
 | **Ativar**                        | Habilita a opção de Open Finance. |
@@ -102,7 +102,7 @@ Veja todas as mudanças no [CHANGELOG.md](CHANGELOG.md)
 
 - OpenCart `4.1.0.1`
 - PHP `8.1` ou superior
-- Conta ativa na [Efí](https://efipay.com.br)
+- Conta ativa no [Efí](https://efipay.com.br)
 - Certificados e chaves de API (conforme documentação)
 
 ---
@@ -115,4 +115,4 @@ Distribuído sob a licença MIT. Veja mais em [LICENSE](LICENSE).
 
 ## 🛠 Suporte
 
-Para dúvidas, abra uma _issue_ aqui no GitHub ou consulte a [documentação da Efí](https://dev.efipay.com.br/docs).
+Para dúvidas, abra uma _issue_ aqui no GitHub ou consulte a [documentação do Efí](https://dev.efipay.com.br/docs).
