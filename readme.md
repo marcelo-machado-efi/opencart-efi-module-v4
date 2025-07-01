@@ -1,6 +1,6 @@
 # Plugin de Pagamento Efí para OpenCart 4
 
-Este plugin oficial do **Efí**, banco digital, permite oferecer múltiplas formas de pagamento em sua loja OpenCart 4.1.0.1 utilizando PHP 8.1: **Pix**, **Boleto Bancário**, **Cartão de Crédito** e **Open Finance**.
+Este plugin oficial do **Efí**, permite oferecer múltiplas formas de pagamento em sua loja OpenCart: **Pix**, **Boleto Bancário**, **Cartão de Crédito** e **Open Finance**.
 
 > ℹ️ Todos os campos obrigatórios devem ser preenchidos corretamente para que o plugin funcione.  
 > 📘 Veja como obter suas credenciais e certificados na [documentação oficial do Efí](https://dev.efipay.com.br/docs).
@@ -30,7 +30,7 @@ Este plugin oficial do **Efí**, banco digital, permite oferecer múltiplas form
 | **Client_Secret Produção**         | [🔗 Saiba como obter](https://dev.efipay.com.br/docs/api-cobrancas/credenciais#criar-uma-aplica%C3%A7%C3%A3o-ou-configurar-uma-j%C3%A1-existente) |
 | **Client_Id Desenvolvimento**      | [🔗 Saiba como obter](https://dev.efipay.com.br/docs/api-cobrancas/credenciais#criar-uma-aplica%C3%A7%C3%A3o-ou-configurar-uma-j%C3%A1-existente) |
 | **Client_Secret Desenvolvimento**  | [🔗 Saiba como obter](https://dev.efipay.com.br/docs/api-cobrancas/credenciais#criar-uma-aplica%C3%A7%C3%A3o-ou-configurar-uma-j%C3%A1-existente) |
-| **Identificador da conta**         | Código único da conta no Efí. |
+| **Identificador da conta**         | Código único da conta no Efí. Para localizá-lo, acesse: `Menu API > Aplicações > Introdução > Identificador da conta`. |
 | **Ordem de Exibição**              | Ordem em que a forma de pagamento será listada no checkout. |
 | **Status do pedido ao finalizar o pagamento** | Define o status que será atribuído ao pedido após pagamento. |
 | **Ativar ambiente de teste**       | Habilita o modo sandbox para testes. |
@@ -46,7 +46,7 @@ Este plugin oficial do **Efí**, banco digital, permite oferecer múltiplas form
 |--------------------------|-----------|
 | **Chave Pix**            | Chave cadastrada no aplicativo do Efí. |
 | **Tempo de expiração da cobrança** | Tempo em horas que a cobrança ficará disponível. |
-| **Certificado**          | Arquivo `.pfx` gerado via painel do Efí. [Ver instruções](https://dev.efipay.com.br/docs/api-pix/credenciais#gerando-um-certificado-p12) |
+| **Certificado**          | Arquivo `.p12` gerado via painel do Efí. [Ver instruções](https://dev.efipay.com.br/docs/api-pix/credenciais#gerando-um-certificado-p12) |
 | **Desconto**             | Valor fixo ou percentual. `10` = R$10, `5%` = percentual. |
 | **Validar mTLS**         | Veja [aqui](https://dev.efipay.com.br/docs/api-pix/webhooks#entendendo-o-padr%C3%A3o-mtls) se sua conta exige esse padrão. |
 | **Ativar**               | Ativa o pagamento por Pix. |
@@ -87,7 +87,7 @@ Este plugin oficial do **Efí**, banco digital, permite oferecer múltiplas form
 |-----------------------------------|-----------|
 | **Chave Pix para recebimento**    | Chave que receberá os pagamentos via Open Finance. |
 | **Desconto**                      | Valor fixo ou percentual. |
-| **Certificado**                   | Certificado digital `.pfx`. |
+| **Certificado**                   | Arquivo `.p12` gerado via painel do Efí. [Ver instruções](https://dev.efipay.com.br/docs/api-pix/credenciais#gerando-um-certificado-p12) |
 | **Ativar**                        | Habilita a opção de Open Finance. |
 
 ---
