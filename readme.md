@@ -24,10 +24,7 @@ Este plugin oficial do **Efí**, permite oferecer múltiplas formas de pagamento
 
 | Campo                              | Descrição |
 |------------------------------------|-----------|
-| **Client_Id Produção**             | [🔗 Saiba como obter](https://dev.efipay.com.br/docs/api-cobrancas/credenciais#criar-uma-aplica%C3%A7%C3%A3o-ou-configurar-uma-j%C3%A1-existente) |
-| **Client_Secret Produção**         | [🔗 Saiba como obter](https://dev.efipay.com.br/docs/api-cobrancas/credenciais#criar-uma-aplica%C3%A7%C3%A3o-ou-configurar-uma-j%C3%A1-existente) |
-| **Client_Id Desenvolvimento**      | [🔗 Saiba como obter](https://dev.efipay.com.br/docs/api-cobrancas/credenciais#criar-uma-aplica%C3%A7%C3%A3o-ou-configurar-uma-j%C3%A1-existente) |
-| **Client_Secret Desenvolvimento**  | [🔗 Saiba como obter](https://dev.efipay.com.br/docs/api-cobrancas/credenciais#criar-uma-aplica%C3%A7%C3%A3o-ou-configurar-uma-j%C3%A1-existente) |
+| **Client_Id e Client_Secret (produção ou desenvolvimento)**             | [🔗 Saiba como obter](https://dev.efipay.com.br/docs/api-cobrancas/credenciais#criar-uma-aplica%C3%A7%C3%A3o-ou-configurar-uma-j%C3%A1-existente) |
 | **Identificador da conta**         | Código único da conta no Efí. Para localizá-lo, acesse: `Menu API > Aplicações > Introdução > Identificador da conta`. |
 | **Ordem de Exibição**              | Ordem em que a forma de pagamento será listada no checkout. |
 | **Status do pedido ao finalizar o pagamento** | Define o status que será atribuído ao pedido após pagamento. |

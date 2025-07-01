@@ -22,6 +22,9 @@ class EfiConfigHelper
             "sandbox"        => (bool) $settings['payment_efi_enviroment'],
             "debug"          => false,
             "timeout"        => 60,
+            "headers"       => [
+                "efi-opencart-version"  => "2.0"
+            ]
         ];
     }
 }
