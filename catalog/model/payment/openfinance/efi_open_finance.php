@@ -26,9 +26,13 @@ class EfiOpenFinance extends \Opencart\System\Engine\Model
         try {
             // Configurações Efí
             $options = EfiConfigHelper::getEfiConfig($settings);
-            $options["headers"] = [
-                "x-idempotency-key" => bin2hex(random_bytes(18))
-            ];
+            $options["headers"] = array_merge(
+                $options["headers"] ?? [],
+                [
+                    "x-idempotency-key" => bin2hex(random_bytes(18))
+                ]
+            );
+
 
             // Monta dados do pagador
             $pagador = [
