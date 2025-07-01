@@ -22,8 +22,6 @@ Este plugin oficial do **Efí**, permite oferecer múltiplas formas de pagamento
 
 ## ⚙️ Configurações Gerais
 
-> ![Print da tela de configurações gerais](docs/config-geral.png)
-
 | Campo                              | Descrição |
 |------------------------------------|-----------|
 | **Client_Id Produção**             | [🔗 Saiba como obter](https://dev.efipay.com.br/docs/api-cobrancas/credenciais#criar-uma-aplica%C3%A7%C3%A3o-ou-configurar-uma-j%C3%A1-existente) |
@@ -40,8 +38,6 @@ Este plugin oficial do **Efí**, permite oferecer múltiplas formas de pagamento
 
 ## 💸 Configuração do Pix
 
-> ![Print da tela de configuração Pix](docs/config-pix.png)
-
 | Campo                    | Descrição |
 |--------------------------|-----------|
 | **Chave Pix**            | Chave cadastrada no aplicativo do Efí. |
@@ -55,12 +51,10 @@ Este plugin oficial do **Efí**, permite oferecer múltiplas formas de pagamento
 
 ## 🧾 Configuração do Boleto
 
-> ![Print da tela de configuração Boleto](docs/config-boleto.png)
-
 | Campo                    | Descrição |
 |--------------------------|-----------|
 | **Dias para vencimento do boleto** | Número de dias após emissão para o vencimento. |
-| **Desconto**             | Valor fixo ou percentual. `5` ou `10%`. |
+| **Desconto**             | Valor fixo ou percentual. `10` = R$10, `5%` = percentual. |
 | **Enviar e-mail para o cliente final** | Se ativo, o boleto será enviado por e-mail. |
 | **Configuração de multa** | Valor da multa após vencimento. Ex: `200` = 2%. |
 | **Configuração de juros** | Valor de juros por dia. Ex: `33` = 0,033% ao dia. |
@@ -71,8 +65,6 @@ Este plugin oficial do **Efí**, permite oferecer múltiplas formas de pagamento
 
 ## 💳 Cartão de Crédito
 
-> ![Print da tela de configuração Cartão](docs/config-cartao.png)
-
 | Campo       | Descrição |
 |-------------|-----------|
 | **Ativar**  | Ativa o pagamento por cartão de crédito. |
@@ -81,12 +73,10 @@ Este plugin oficial do **Efí**, permite oferecer múltiplas formas de pagamento
 
 ## 🔐 Open Finance
 
-> ![Print da tela de configuração Open Finance](docs/config-open-finance.png)
-
 | Campo                             | Descrição |
 |-----------------------------------|-----------|
 | **Chave Pix para recebimento**    | Chave que receberá os pagamentos via Open Finance. |
-| **Desconto**                      | Valor fixo ou percentual. |
+| **Desconto**                      | Valor fixo ou percentual. `10` = R$10, `5%` = percentual. |
 | **Certificado**                   | Arquivo `.p12` gerado via painel do Efí. [Ver instruções](https://dev.efipay.com.br/docs/api-pix/credenciais#gerando-um-certificado-p12) |
 | **Ativar**                        | Habilita a opção de Open Finance. |
 
@@ -101,7 +91,7 @@ Veja todas as mudanças no [CHANGELOG.md](CHANGELOG.md)
 ## ✅ Requisitos
 
 - OpenCart `4.1.0.1`
-- PHP `8.1` ou superior
+- PHP `8.1` 
 - Conta ativa no [Efí](https://efipay.com.br)
 - Certificados e chaves de API (conforme documentação)
 
