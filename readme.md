@@ -11,7 +11,7 @@ Este plugin oficial do **Efí**, permite oferecer múltiplas formas de pagamento
 
 1. Acesse o painel administrativo do OpenCart.
 2. Vá até o menu `Extensões > Instalador de Extensões`.
-3. Clique em **Enviar** e selecione o arquivo `efi.ocmod.zip` localizado na pasta `upload` deste repositório.
+3. Clique em **Enviar** e selecione o arquivo [`efi.ocmod.zip`](./upload/efi.ocmod.zip) localizado na pasta `upload` deste repositório.
 4. Após o upload, vá para `Extensões > Extensões`, escolha `Pagamentos` no seletor.
 5. Procure por **Efí Bank** e clique em **Instalar**.
 6. Após instalar, clique em **Editar** para configurar as credenciais, certificados e demais campos obrigatórios.
