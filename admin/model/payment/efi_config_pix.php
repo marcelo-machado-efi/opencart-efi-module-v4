@@ -16,6 +16,7 @@ class EfiConfigPix extends \Opencart\System\Engine\Model
     {
         return [
             'name' => 'Pix',
+            'icon' => 'fa-solid fa-qrcode',
             'inputs' => [
                 [
                     'name'     => 'payment_efi_pix_key',

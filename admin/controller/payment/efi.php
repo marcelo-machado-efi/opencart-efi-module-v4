@@ -58,7 +58,6 @@ class Efi extends \Opencart\System\Engine\Controller
 		$this->load->language('extension/efi/payment/efi');
 		$this->load->model('extension/efi/payment/efi_config');
 
-		$this->install();
 
 		$this->document->setTitle($this->language->get('heading_title'));
 
@@ -82,6 +81,8 @@ class Efi extends \Opencart\System\Engine\Controller
 		$data['upload']                      = $this->url->link('extension/efi/common/upload', 'user_token=' . $this->session->data['user_token']);
 		$data['back']                        = $this->url->link('marketplace/extension', 'user_token=' . $this->session->data['user_token'] . '&type=payment');
 		$data['payment_efi_order_status_id'] = $this->config->get('payment_efi_order_status_id');
+		$data['payment_efi_image_logo'] = HTTPS_CATALOG . 'extension/efi/admin/view/image/efi_logo.png';
+
 
 		$this->load->model('localisation/order_status');
 		$data['order_statuses']        = $this->model_localisation_order_status->getOrderStatuses();

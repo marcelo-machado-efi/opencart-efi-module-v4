@@ -16,10 +16,11 @@ class EfiConfigCard extends \Opencart\System\Engine\Model
     {
         return [
             'name' => 'Cartão de Crédito',
+            'icon' => 'fa-solid fa-credit-card',
             'inputs' => [
                 [
                     'name' => 'payment_efi_card_status',
-                    'required' => true,
+                    'required' => false,
                     'label' => $language->get('entry_credit_card_status'),
                     'type' => 'checkbox',
                     'value' => ''

@@ -16,6 +16,7 @@ class EfiConfigBillet extends \Opencart\System\Engine\Model
     {
         return [
             'name' => 'Boleto',
+            'icon' => 'fa-solid fa-file-invoice',
             'inputs' => [
                 [
                     'name'     => 'payment_efi_billet_expire_at',
@@ -67,7 +68,7 @@ class EfiConfigBillet extends \Opencart\System\Engine\Model
                 ],
                 [
                     'name'     => 'payment_efi_billet_status',
-                    'required' => true,
+                    'required' => false,
                     'label'    => $language->get('entry_billet_status'),
                     'tooltip'  => '',
                     'type'     => 'checkbox',

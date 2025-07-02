@@ -19,6 +19,7 @@ class EfiConfigRequired extends \Opencart\System\Engine\Model
 
         return [
             'name' => 'Configurações gerais',
+            'icon' => 'fa-solid fa-gear',
             'inputs' => [
                 [
                     'name'     => 'payment_efi_client_id_production',

@@ -16,6 +16,7 @@ class EfiConfigOpenFinance extends \Opencart\System\Engine\Model
     {
         return [
             'name' => 'Open Finance',
+            'icon' => 'fa-solid fa-money-bill-transfer',
             'inputs' => [
                 [
                     'name'     => 'payment_efi_open_finance_key',
@@ -43,7 +44,7 @@ class EfiConfigOpenFinance extends \Opencart\System\Engine\Model
                 ],
                 [
                     'name'     => 'payment_efi_open_finance_status',
-                    'required' => true,
+                    'required' => false,
                     'label'    => $language->get('entry_open_finance_status'),
                     'tooltip'  => '', // Não exibe tooltip nesse campo
                     'type'     => 'checkbox',

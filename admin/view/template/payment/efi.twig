@@ -28,12 +28,14 @@
 				{{ text_edit }}
 			</div>
 			<div class="card-body">
-				<form id="form-payment" action="{{ save }}" method="post" data-oc-toggle="ajax">
+				<form
+					id="form-payment" action="{{ save }}" method="post" data-oc-toggle="ajax">
 					<!-- Nav Pills -->
 					<ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
 						{% for option in options %}
 							<li class="nav-item" role="presentation">
 								<button class="nav-link {% if loop.first %}active{% endif %}" id="pills-{{ option.name | lower | replace({' ': '-'}) }}-tab" data-bs-toggle="pill" data-bs-target="#pills-{{ option.name | lower | replace({' ': '-'}) }}" type="button" role="tab" aria-controls="pills-{{ option.name | lower | replace({' ': '-'}) }}" aria-selected="{{ loop.first ? 'true' : 'false' }}">
+									<i class="{{ option.icon }}"></i>
 									{{ option.name }}
 								</button>
 							</li>
@@ -72,7 +74,8 @@
 														<button type="button" class="btn btn-primary me-3" data-oc-target="#input-{{ input.name }}" data-oc-toggle="upload" data-oc-url="{{ upload }}" data-oc-size-max="2048" data-oc-size-error="Arquivo muito grande!">
 															Selecionar Novo Certificado
 														</button>
-														<p class="form-text">Arquivo enviado: {{ input.value }}</p>
+														<p class="form-text">Arquivo enviado:
+															{{ input.value }}</p>
 													{% else %}
 														<button type="button" class="btn btn-primary" data-oc-target="#input-{{ input.name }}" data-oc-toggle="upload" data-oc-url="{{ upload }}" data-oc-size-max="2048" data-oc-size-error="Arquivo muito grande!">
 															Selecionar Certificado
@@ -83,7 +86,7 @@
 											{% elseif input.type == 'select' %}
 												<select name="{{ input.name }}" id="input-{{ input.name }}" class="form-select">
 													{% for option_value in input.options %}
-														<option value="{{ option_value.value }}" {% if option_value.value == input.value %}selected{% endif %}>
+														<option value="{{ option_value.value }}" {% if option_value.value == input.value %} selected {% endif %}>
 															{{ option_value.label }}
 														</option>
 													{% endfor %}
@@ -99,5 +102,21 @@
 			</div>
 		</div>
 	</div>
+	<div class="container">
+		<div class="row justify-content-center">
+			<div class="col-3">
+				<img src="{{ payment_efi_image_logo }}" class="img-fluid" alt="">
+			
+			</div>
+
+		</div>
+		<div class="row justify-content-center">
+			<div class="col-3">
+				<p class="text-center fs-5 ">Efí Pagamentos - Módulo Oficial v2.0.0</p>
+			</div>
+
+		</div>
+	</div>
 </div>
+
 {{ footer }}
